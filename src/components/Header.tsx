@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart3, Globe, TrendingUp, User, LogOut, ChevronDown, Menu, X, BookOpen, Award, Users } from 'lucide-react';
+import { BarChart3, Globe, User, LogOut, ChevronDown, Menu, X, BookOpen, Award, Users } from 'lucide-react';
 
 interface HeaderProps {
   selectedYear: number;
@@ -24,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Top Banner - Partnership Information */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 text-white">
+      {/* <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center justify-between py-3 text-sm">
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6 mb-2 lg:mb-0">
@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
