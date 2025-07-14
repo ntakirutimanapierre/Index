@@ -23,10 +23,13 @@ export interface ProcessedGeoData {
 
 // African country ISO codes
 const AFRICAN_COUNTRIES = new Set([
-  'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'CM', 'CV', 'CF', 'TD', 'KM', 'CG', 'CD', 'DJ', 'EG', 'GQ', 'ER', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'CI', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML', 'MR', 'MU', 'MA', 'MZ', 'NA', 'NE', 'NG', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'ZA', 'SS', 'SD', 'SZ', 'TZ', 'TG', 'TN', 'UG', 'ZM', 'ZW'
+  'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'CM', 'CV', 'CF', 'TD', 'KM', 'CG', 'CD', 'DJ',
+  'EG', 'GQ', 'ER', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'CI', 'KE', 'LS', 'LR', 'LY',
+  'MG', 'MW', 'ML', 'MR', 'MU', 'MA', 'MZ', 'NA', 'NE', 'NG', 'RW', 'ST', 'SN', 'SC',
+  'SL', 'SO', 'ZA', 'SS', 'SD', 'SZ', 'TZ', 'TG', 'TN', 'UG', 'ZM', 'ZW'
 ]);
 
-// Simplified GeoJSON data for African countries (fallback when shapefile library is not available)
+// Simplified fallback GeoJSON
 const SIMPLIFIED_AFRICAN_GEOJSON: ProcessedGeoData = {
   type: 'FeatureCollection',
   features: [
@@ -138,33 +141,30 @@ const SIMPLIFIED_AFRICAN_GEOJSON: ProcessedGeoData = {
 };
 
 /**
- * Process shapefile data and filter for African countries
+ * Load and process GeoJSON shapefile
  */
 export const processShapefileData = async (shapefilePath: string): Promise<ProcessedGeoData> => {
   try {
-    console.log('Processing shapefile:', shapefilePath);
-    
-    // For now, we'll use the simplified data since the shapefile library isn't installed
-    // In a production environment, you would:
-    // 1. Import the shapefile library
-    // 2. Load and parse the .shp file
-    // 3. Load and parse the .dbf file for attributes
-    // 4. Combine them into GeoJSON format
-    // 5. Filter for African countries
-    
-    // Check if we're trying to load the local shapefile
-    if (shapefilePath.includes('ne_110m_admin_0_countries')) {
-      console.log('Using simplified African countries data as fallback');
-      return SIMPLIFIED_AFRICAN_GEOJSON;
+    console.log('🔍 Fetching GeoJSON from:', shapefilePath);
+
+    const response = await fetch(shapefilePath);
+    if (!response.ok) {
+      throw new Error(`Failed to load GeoJSON: ${response.statusText}`);
     }
-    
+
+    const geojson = await response.json();
+
+    const features = filterAfricanCountries(geojson.features);
+    console.log(`✅ Loaded ${features.length} African features`);
+
     return {
       type: 'FeatureCollection',
-      features: []
+      features: features
     };
   } catch (error) {
-    console.error('Error processing shapefile:', error);
-    throw new Error('Failed to process shapefile data');
+    console.error('❌ Error loading GeoJSON:', error);
+    console.log('⚠️ Using fallback simplified map data');
+    return SIMPLIFIED_AFRICAN_GEOJSON;
   }
 };
 
@@ -172,7 +172,7 @@ export const processShapefileData = async (shapefilePath: string): Promise<Proce
  * Filter features for African countries only
  */
 export const filterAfricanCountries = (features: ShapefileFeature[]): ShapefileFeature[] => {
-  return features.filter(feature => {
+  return features.filter((feature) => {
     const isoCode = feature.properties.ISO_A2;
     return AFRICAN_COUNTRIES.has(isoCode);
   });
@@ -182,21 +182,21 @@ export const filterAfricanCountries = (features: ShapefileFeature[]): ShapefileF
  * Match country data with shapefile features
  */
 export const matchCountryData = (
-  geoFeatures: ShapefileFeature[], 
+  geoFeatures: ShapefileFeature[],
   countryData: CountryData[]
 ): Map<string, { feature: ShapefileFeature; data: CountryData | null }> => {
   const countryMap = new Map();
-  
-  geoFeatures.forEach(feature => {
+
+  geoFeatures.forEach((feature) => {
     const isoCode = feature.properties.ISO_A2;
-    const countryDataItem = countryData.find(c => c.id === isoCode);
-    
+    const countryDataItem = countryData.find((c) => c.id === isoCode);
+
     countryMap.set(isoCode, {
       feature,
       data: countryDataItem || null
     });
   });
-  
+
   return countryMap;
 };
 
@@ -205,29 +205,31 @@ export const matchCountryData = (
  */
 export const coordinatesToPath = (coordinates: number[][][]): string => {
   if (!coordinates || coordinates.length === 0) return '';
-  
+
   const paths: string[] = [];
-  
-  coordinates.forEach(polygon => {
+
+  coordinates.forEach((polygon) => {
     if (polygon.length === 0) return;
-    
-    const path = polygon.map((point, index) => {
-      const [x, y] = point;
-      return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
-    }).join(' ') + ' Z';
-    
+
+    const path = polygon
+      .map((point, index) => {
+        const [x, y] = point;
+        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ') + ' Z';
+
     paths.push(path);
   });
-  
+
   return paths.join(' ');
 };
 
 /**
- * Get country color based on fintech index score
+ * Get country color based on score
  */
 export const getCountryColor = (countryData: CountryData | null): string => {
   if (!countryData) return '#E5E7EB';
-  
+
   const score = countryData.finalScore;
   if (score >= 80) return '#10B981';
   if (score >= 60) return '#F59E0B';
@@ -236,31 +238,22 @@ export const getCountryColor = (countryData: CountryData | null): string => {
 };
 
 /**
- * Create a simplified map data structure for fallback
+ * Create fallback simplified map data
  */
 export const createSimplifiedMapData = (): ProcessedGeoData => {
   return SIMPLIFIED_AFRICAN_GEOJSON;
 };
 
 /**
- * Validate shapefile path and format
+ * Validate shapefile path (.geojson or .json)
  */
 export const validateShapefilePath = (path: string): boolean => {
-  // Basic validation - check if path ends with .shp or contains shapefile name
-  return (path.endsWith('.shp') || path.includes('ne_110m_admin_0_countries')) && path.length > 0;
+  return path.endsWith('.geojson') || path.endsWith('.json');
 };
 
 /**
- * Get associated shapefile files
- */
-export const getShapefileFiles = (basePath: string): string[] => {
-  const extensions = ['.shp', '.dbf', '.shx', '.prj'];
-  return extensions.map(ext => basePath.replace('.shp', ext));
-};
-
-/**
- * Get the local shapefile path
+ * Return local geojson path
  */
 export const getLocalShapefilePath = (): string => {
-  return '/src/data/ne_110m_admin_0_countries.shp';
-}; 
+  return '/data/africa.geojson'; 
+};
