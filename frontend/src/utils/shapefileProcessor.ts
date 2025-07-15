@@ -1,4 +1,6 @@
-import { CountryData } from '../types';
+import type { CountryData } from '../types';
+import { geoMercator } from 'd3-geo';
+import type { GeoProjection } from 'd3-geo';
 
 // Types for shapefile processing
 export interface ShapefileFeature {
@@ -172,10 +174,14 @@ export const processShapefileData = async (shapefilePath: string): Promise<Proce
  * Filter features for African countries only
  */
 export const filterAfricanCountries = (features: ShapefileFeature[]): ShapefileFeature[] => {
-  return features.filter((feature) => {
+  const filtered = features.filter((feature) => {
     const isoCode = feature.properties.ISO_A2;
     return AFRICAN_COUNTRIES.has(isoCode);
   });
+  if (filtered.length !== features.length) {
+    console.warn('Some non-African features were present in the GeoJSON and have been filtered out.');
+  }
+  return filtered;
 };
 
 /**
@@ -200,6 +206,19 @@ export const matchCountryData = (
   return countryMap;
 };
 
+// Project lon/lat to SVG coordinates using Mercator projection
+const projection = geoMercator()
+  .center([20, 0]) // Center on Africa
+  .scale(500)
+  .translate([450, 350]); // SVG center (adjust as needed)
+
+function projectCoordinates(coords: number[]): [number, number] {
+  if (Array.isArray(coords) && coords.length === 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+    return projection([coords[0], coords[1]]) as [number, number];
+  }
+  return [0, 0];
+}
+
 /**
  * Convert coordinates to SVG path
  */
@@ -213,7 +232,7 @@ export const coordinatesToPath = (coordinates: number[][][]): string => {
 
     const path = polygon
       .map((point, index) => {
-        const [x, y] = point;
+        const [x, y] = projectCoordinates(point);
         return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
       .join(' ') + ' Z';
