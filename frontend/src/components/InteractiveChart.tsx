@@ -213,14 +213,14 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ data, allYea
               {/* Year Range Selector */}
               <div className="flex items-center space-x-2 px-3 py-2 bg-gray-50 rounded-lg">
                 <Calendar className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">Range:</span>
+                <span className="text-sm text-black whitespace-nowrap">Range:</span>
                 <select
                   value={yearRange}
                   onChange={(e) => setYearRange(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
-                  className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none"
+                  className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none text-black"
                 >
                   {yearRangeOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value} className="text-black">{option.label}</option>
                   ))}
                 </select>
               </div>
@@ -231,20 +231,20 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ data, allYea
                   <select
                     value={customStartYear}
                     onChange={(e) => setCustomStartYear(Number(e.target.value))}
-                    className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none"
+                    className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none text-black"
                   >
                     {availableYears.map(year => (
-                      <option key={year} value={year}>{year}</option>
+                      <option key={year} value={year} className="text-black">{year}</option>
                     ))}
                   </select>
-                  <span className="text-sm text-gray-500">to</span>
+                  <span className="text-sm text-black">to</span>
                   <select
                     value={customEndYear}
                     onChange={(e) => setCustomEndYear(Number(e.target.value))}
-                    className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none"
+                    className="text-sm border-0 bg-transparent focus:ring-0 focus:outline-none text-black"
                   >
                     {availableYears.filter(year => year >= customStartYear).map(year => (
-                      <option key={year} value={year}>{year}</option>
+                      <option key={year} value={year} className="text-black">{year}</option>
                     ))}
                   </select>
                 </div>
