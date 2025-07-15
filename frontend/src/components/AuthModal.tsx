@@ -34,6 +34,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
     'Libya', 'Sudan', 'South Sudan', 'Eritrea', 'Djibouti', 'Somalia', 'Other'
   ];
 
+  // Sort countries alphabetically
+  const [countrySearch, setCountrySearch] = useState('');
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+  const sortedCountries = countries.slice().sort((a, b) => a.localeCompare(b));
+  const filteredCountries = sortedCountries.filter(country => country.toLowerCase().includes(countrySearch.toLowerCase()));
+
   if (!isOpen) return null;
 
   const resetForm = () => {
@@ -220,20 +226,40 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Country <span className="text-red-500">*</span>
                 </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" />
-                  <select
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                <div className="relative mb-2">
+                  <input
+                    type="text"
+                    value={countrySearch}
+                    onChange={e => {
+                      setCountrySearch(e.target.value);
+                      setFormData({ ...formData, country: '' });
+                      setCountryDropdownOpen(true);
+                    }}
+                    onFocus={() => setCountryDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setCountryDropdownOpen(false), 100)}
+                    placeholder="Search country..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black mb-2 bg-white"
+                    autoComplete="off"
                     required
-                  >
-                    <option value="">Select your country</option>
-                    {countries.map(country => (
-                      <option key={country} value={country}>{country}</option>
-                    ))}
-                  </select>
+                  />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+                  {countryDropdownOpen && filteredCountries.length > 0 && (
+                    <ul className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg z-20">
+                      {filteredCountries.map(country => (
+                        <li
+                          key={country}
+                          className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-black"
+                          onMouseDown={() => {
+                            setCountrySearch(country);
+                            setFormData({ ...formData, country });
+                            setCountryDropdownOpen(false);
+                          }}
+                        >
+                          {country}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
 
@@ -339,69 +365,50 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
 
           <button
             type="submit"
+            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
             disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Processing...' : (
+            {loading ? 'Processing...' : 
               mode === 'login' ? 'Sign In' : 
               mode === 'register' ? 'Create Account' : 
-              'Create Admin'
-            )}
+              mode === 'admin-create' ? 'Create Admin Account' : 'Submit'
+            }
           </button>
-        </form>
-
-        <div className="p-4 border-t bg-gray-50 rounded-b-xl">
-          <div className="flex justify-center space-x-4 text-sm">
-            {mode !== 'login' && (
-              <button
-                onClick={() => {
-                  setMode('login');
-                  resetForm();
-                }}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                Sign In
-              </button>
-            )}
-            {mode !== 'register' && (
-              <button
-                onClick={() => {
-                  setMode('register');
-                  resetForm();
-                }}
-                className="text-blue-600 hover:text-blue-700"
-              >
-                Create Account
-              </button>
-            )}
-            {currentUser?.role === 'admin' && mode !== 'admin-create' && (
-              <button
-                onClick={() => {
-                  setMode('admin-create');
-                  resetForm();
-                }}
-                className="text-purple-600 hover:text-purple-700 flex items-center space-x-1"
-              >
-                <Shield className="w-3 h-3" />
-                <span>Create Admin</span>
-              </button>
-            )}
-          </div>
 
           {mode === 'login' && (
-            <div className="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-700">
-              <p><strong>Demo Accounts:</strong></p>
-              <p>Admin: admin@fintech.com / admin123</p>
-              <p>User: user@example.com / user123</p>
+            <div className="text-center text-sm text-gray-600 mt-4">
+              Don't have an account?{' '}
+              <span
+                className="text-blue-600 cursor-pointer hover:underline"
+                onClick={() => setMode('register')}
+              >
+                Create one
+              </span>
             </div>
           )}
-
           {mode === 'register' && (
-            <div className="mt-3 p-2 bg-green-50 rounded text-xs text-green-700">
-              <p><strong>Note:</strong> After registration, you'll receive an email verification link. Please check your inbox and spam folder.</p>
+            <div className="text-center text-sm text-gray-600 mt-4">
+              Already have an account?{' '}
+              <span
+                className="text-blue-600 cursor-pointer hover:underline"
+                onClick={() => setMode('login')}
+              >
+                Sign In
+              </span>
             </div>
           )}
-        </div>
+          {mode === 'admin-create' && (
+            <div className="text-center text-sm text-gray-600 mt-4">
+              Back to{' '}
+              <span
+                className="text-blue-600 cursor-pointer hover:underline"
+                onClick={() => setMode('login')}
+              >
+                Sign In
+              </span>
+            </div>
+          )}
+        </form>
       </div>
     </div>
   );

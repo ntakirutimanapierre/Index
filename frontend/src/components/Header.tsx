@@ -54,9 +54,12 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
             <div className="flex items-center space-x-3 min-w-0">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex-shrink-0">
-                <Globe className="w-6 h-6 text-white" />
-              </div>
+              <img
+                src="/logo.jpg"
+                alt="African Fintech Index Logo"
+                className="w-12 h-12 object-contain rounded-lg shadow-sm bg-white border border-gray-200 flex-shrink-0"
+                style={{ background: 'white' }}
+              />
               <div className="hidden sm:block min-w-0">
                 <h1 className="text-xl font-bold text-gray-900 truncate">African Fintech Index</h1>
                 <p className="text-sm text-gray-500 truncate">Financial Technology Development Across Africa</p>
