@@ -292,19 +292,19 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
         <div className="flex items-center justify-center gap-6 py-2">
           <div className="flex items-center gap-2">
             <span className="inline-block w-5 h-5 rounded bg-emerald-500 border border-gray-700"></span>
-            <span className="text-xs text-gray-200">High (80+)</span>
+            <span className="text-xs text-black">High (80+)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-5 h-5 rounded bg-yellow-400 border border-gray-700"></span>
-            <span className="text-xs text-gray-200">Medium (60-79)</span>
+            <span className="text-xs text-black">Medium (60-79)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-5 h-5 rounded bg-red-400 border border-gray-700"></span>
-            <span className="text-xs text-gray-200">Low (40-59)</span>
+            <span className="text-xs text-black">Low (40-59)</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-block w-5 h-5 rounded bg-gray-400 border border-gray-700"></span>
-            <span className="text-xs text-gray-200">Very Low (&lt;40)</span>
+            <span className="text-xs text-black">Very Low (&lt;40)</span>
           </div>
         </div>
       </div>

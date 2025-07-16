@@ -34,6 +34,17 @@ body {
   min-height: 100vh;
 }
 
+html, body {
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  /* Tailwind's from-blue-50 to-purple-50 gradient */
+  background: linear-gradient(to bottom right, #eff6ff 0%, #f5f3ff 100%);
+  /* fallback for browsers that don't support gradients */
+  background-color: #eff6ff;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

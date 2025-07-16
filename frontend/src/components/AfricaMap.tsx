@@ -1,5 +1,5 @@
 import React from 'react';
-import { CountryData } from '../types';
+import type { CountryData } from '../types';
 
 interface AfricaMapProps {
   data: CountryData[];
@@ -195,22 +195,22 @@ export const AfricaMap: React.FC<AfricaMapProps> = ({ data, onCountryHover, hove
         </div>
         
         {/* Legend */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 flex-shrink-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4 flex-shrink-0 text-black">
           <div className="flex items-center space-x-2 p-2 bg-green-50 rounded-lg">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-xs font-medium text-green-800">High (80+)</span>
+            <span className="text-black">High (80+)</span>
           </div>
           <div className="flex items-center space-x-2 p-2 bg-yellow-50 rounded-lg">
             <div className="w-3 h-3 bg-yellow-500 rounded"></div>
-            <span className="text-xs font-medium text-yellow-800">Medium (60-79)</span>
+            <span className="text-black">Medium (60-79)</span>
           </div>
           <div className="flex items-center space-x-2 p-2 bg-red-50 rounded-lg">
             <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span className="text-xs font-medium text-red-800">Low (40-59)</span>
+            <span className="text-black">Low (40-59)</span>
           </div>
-          <div className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
-            <div className="w-3 h-3 bg-gray-500 rounded"></div>
-            <span className="text-xs font-medium text-gray-800">Very Low (&lt;40)</span>
+          <div className="flex items-center space-x-2 p-2 bg-gray-100 rounded-lg">
+            <div className="w-3 h-3 bg-gray-400 rounded"></div>
+            <span className="text-black">Very Low (&lt;40)</span>
           </div>
         </div>
       </div>

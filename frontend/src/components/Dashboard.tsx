@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Sidebar } from './Sidebar';
-import { Header } from './Header';
+import React, { useState, useEffect } from 'react';
 import { Footer } from './Footer';
 import { StatsCards } from './StatsCards';
 import { AfricaMap } from './AfricaMap';
@@ -18,12 +16,137 @@ import { useDataPersistence } from '../hooks/useDataPersistence';
 import type { CountryData } from '../types';
 import { getLocalShapefilePath } from '../utils/shapefileProcessor';
 
-const Dashboard = () => {
-  const [selectedYear, setSelectedYear] = useState(availableYears[0]);
+interface DashboardProps {
+  selectedYear: number;
+  onYearChange: (year: number) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => {
   const [hoveredCountry, setHoveredCountry] = useState<CountryData | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [useNewMap, setUseNewMap] = useState(true);
+  const [unverifiedUsers, setUnverifiedUsers] = useState<any[]>([]);
+  const [loadingUnverified, setLoadingUnverified] = useState(false);
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [editingUser, setEditingUser] = useState<any | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', role: 'viewer', isVerified: false });
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [userSearch, setUserSearch] = useState('');
+
+  useEffect(() => {
+    // Load user from localStorage on mount
+    const stored = localStorage.getItem('fintechUser');
+    if (stored) {
+      setCurrentUser(JSON.parse(stored));
+    }
+  }, []);
+
+  // Fetch unverified users if admin
+  useEffect(() => {
+    if (currentUser?.role === 'admin' && currentUser.token) {
+      setLoadingUnverified(true);
+      fetch('/api/users/unverified', {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          setUnverifiedUsers(data);
+          setLoadingUnverified(false);
+        })
+        .catch(() => setLoadingUnverified(false));
+    }
+  }, [currentUser]);
+
+  // Fetch all users if admin
+  useEffect(() => {
+    if (currentUser?.role === 'admin' && currentUser.token) {
+      setLoadingUsers(true);
+      fetch('/api/users', {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          setAllUsers(data);
+          setLoadingUsers(false);
+        })
+        .catch(() => setLoadingUsers(false));
+    }
+  }, [currentUser]);
+
+  const handleVerifyUser = async (userId: string) => {
+    if (!currentUser?.token) return;
+    if (window.confirm('Are you sure you want to verify this user?')) {
+      try {
+        await fetch(`/api/users/${userId}/verify`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${currentUser.token}` },
+        });
+        setUnverifiedUsers(users => users.filter(u => u._id !== userId));
+        setNotification({ type: 'success', message: 'User verified and notified by email.' });
+      } catch {
+        setNotification({ type: 'error', message: 'Failed to verify user.' });
+      }
+    }
+  };
+
+  const handleEditUser = (user: any) => {
+    setEditingUser(user);
+    setEditForm({ name: user.name, role: user.role, isVerified: user.isVerified });
+  };
+
+  const handleEditFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleEditFormCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.checked });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser || !currentUser?.token) return;
+    try {
+      await fetch(`/api/users/${editingUser._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${currentUser.token}` },
+        body: JSON.stringify(editForm),
+      });
+      setEditingUser(null);
+      setLoadingUsers(true);
+      fetch('/api/users', {
+        headers: { Authorization: `Bearer ${currentUser.token}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          setAllUsers(data);
+          setLoadingUsers(false);
+          setNotification({ type: 'success', message: 'User updated.' });
+        })
+        .catch(() => {
+          setLoadingUsers(false);
+          setNotification({ type: 'error', message: 'Failed to update user.' });
+        });
+    } catch {
+      setNotification({ type: 'error', message: 'Failed to update user.' });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!currentUser?.token) return;
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await fetch(`/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${currentUser.token}` },
+        });
+        setAllUsers(users => users.filter(u => u._id !== userId));
+        setNotification({ type: 'success', message: 'User deleted.' });
+      } catch {
+        setNotification({ type: 'error', message: 'Failed to delete user.' });
+      }
+    }
+  };
 
   const { data: countryData, isLoading, updateData, clearData, getDataInfo } = useDataPersistence(mockCountryData);
   const currentData = countryData.filter(country => country.year === selectedYear);
@@ -37,8 +160,14 @@ const Dashboard = () => {
     updateData(newData);
   };
 
-  const handleAuthSuccess = (user: any) => setCurrentUser(user);
-  const handleLogout = () => setCurrentUser(null);
+  const handleAuthSuccess = (user: any) => {
+    setCurrentUser(user);
+    localStorage.setItem('fintechUser', JSON.stringify(user));
+  };
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('fintechUser');
+  };
 
   if (isLoading) {
     return (
@@ -52,22 +181,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex">
-      <Sidebar
-        currentUser={currentUser}
-        onSignIn={() => setShowAuthModal(true)}
-        onSignOut={handleLogout}
-      />
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
-        <Header 
-          selectedYear={selectedYear}
-          onYearChange={setSelectedYear}
-          availableYears={availableYears}
-          currentUser={currentUser}
-          onAuthClick={() => setShowAuthModal(true)}
-          onLogout={handleLogout}
-        />
-        <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
+      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10">
           {/* Stats Overview */}
           <StatsCards stats={currentStats} />
           {/* Map Type Toggle */}
@@ -167,6 +282,124 @@ const Dashboard = () => {
               <p className="text-sm text-gray-500">Make sure to include year and fintech companies data in your file</p>
             </div>
           )}
+          {/* Admin: Unverified Users */}
+          {currentUser?.role === 'admin' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-black">Unverified Users</h3>
+              {loadingUnverified ? (
+                <p>Loading...</p>
+              ) : unverifiedUsers.length === 0 ? (
+                <p>No unverified users.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {unverifiedUsers.map(user => (
+                    <li key={user._id} className="flex items-center justify-between border-b pb-2">
+                      <span className="text-black">
+                        {user.email} ({user.role})
+                      </span>
+                      <button
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                        onClick={() => handleVerifyUser(user._id)}
+                      >
+                        Verify
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+          {/* Admin: All Users */}
+          {currentUser?.role === 'admin' && (
+            <div id="user-management" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4">All Users</h3>
+              {loadingUsers ? (
+                <p>Loading...</p>
+              ) : allUsers.length === 0 ? (
+                <p>No users found.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {notification && (
+                    <div className={`mb-4 p-3 rounded ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{notification.message}</div>
+                  )}
+                  {/* User search/filter */}
+                  <div className="mb-4">
+                    <input
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      placeholder="Search users by email or name..."
+                      value={userSearch}
+                      onChange={e => setUserSearch(e.target.value)}
+                    />
+                  </div>
+                  {allUsers.filter(user =>
+                    user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
+                    (user.name && user.name.toLowerCase().includes(userSearch.toLowerCase()))
+                  ).map(user => (
+                    <li key={user._id} className="flex items-center justify-between border-b pb-2">
+                      <span className={user.isVerified ? 'text-black' : 'text-gray-500'}>
+                        {user.email} ({user.role}) {user.isVerified ? <span className="text-green-600">✔️</span> : <span className="text-red-600">❌</span>}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          onClick={() => handleEditUser(user)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          onClick={() => handleDeleteUser(user._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {/* Edit Modal */}
+              {editingUser && (
+                <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 w-96">
+                    <h4 className="text-lg font-semibold mb-4">Edit User</h4>
+                    <label className="block mb-2">Name
+                      <input
+                        className="w-full border border-gray-300 rounded px-2 py-1"
+                        name="name"
+                        value={editForm.name}
+                        onChange={handleEditFormChange}
+                      />
+                    </label>
+                    <label className="block mb-2">Role
+                      <select
+                        className="w-full border border-gray-300 rounded px-2 py-1"
+                        name="role"
+                        value={editForm.role}
+                        onChange={handleEditFormChange}
+                      >
+                        <option value="viewer">Viewer</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </label>
+                    <label className="block mb-4">Verified
+                      <input
+                        type="checkbox"
+                        name="isVerified"
+                        checked={!!editForm.isVerified}
+                        onChange={handleEditFormCheckbox}
+                        className="ml-2"
+                      />
+                    </label>
+                    <div className="flex gap-2 justify-end">
+                      <button className="px-3 py-1 bg-gray-300 rounded" onClick={() => setEditingUser(null)}>Cancel</button>
+                      <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={handleSaveEdit}>Save</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </main>
         <Footer />
         <AuthModal
@@ -176,8 +409,7 @@ const Dashboard = () => {
           currentUser={currentUser}
         />
       </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard; 

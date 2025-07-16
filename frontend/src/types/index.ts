@@ -41,10 +41,12 @@ export interface YearlyTrend {
 export interface User {
   id: string;
   email: string;
-  role: 'admin' | 'user';
-  isVerified: boolean;
+  role: 'admin' | 'editor' | 'viewer';
+  isVerified?: boolean;
   createdAt: number;
   createdBy?: string;
+  name?: string;
+  token?: string; // JWT token for frontend session
 }
 
 export interface NewsArticle {

@@ -23,6 +23,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [registerRole, setRegisterRole] = useState<'editor' | 'viewer'>('viewer');
 
   const countries = [
     'Nigeria', 'South Africa', 'Kenya', 'Egypt', 'Ghana', 'Morocco', 'Ethiopia', 'Tanzania',
@@ -70,80 +71,59 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
           setLoading(false);
           return;
         }
-
         if (formData.password !== formData.confirmPassword) {
           setMessage({ type: 'error', text: 'Passwords do not match' });
           setLoading(false);
           return;
         }
-
-        // Simulate email verification
-        setMessage({ 
-          type: 'success', 
-          text: 'Registration successful! Please check your email to verify your account. We\'ve sent a confirmation link to complete your registration.' 
+        // Call backend register API
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            name: formData.firstName + ' ' + formData.lastName,
+            role: registerRole,
+            isVerified: false,
+          }),
         });
-        
-        // Simulate user creation
-        const newUser = {
-          id: Date.now().toString(),
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          organization: formData.organization,
-          country: formData.country,
-          phoneNumber: formData.phoneNumber,
-          jobTitle: formData.jobTitle,
-          role: 'user',
-          isVerified: false,
-          createdAt: Date.now()
-        };
-        
-        setTimeout(() => {
-          onAuthSuccess(newUser);
-          onClose();
-          resetForm();
-        }, 3000);
-        
-      } else if (mode === 'login') {
-        // Demo login logic
-        if (formData.email === 'admin@fintech.com' && formData.password === 'admin123') {
-          onAuthSuccess({
-            id: 'admin1',
-            email: 'admin@fintech.com',
-            firstName: 'Admin',
-            lastName: 'User',
-            role: 'admin',
-            isVerified: true
-          });
-          onClose();
-          resetForm();
-        } else if (formData.email === 'user@example.com' && formData.password === 'user123') {
-          onAuthSuccess({
-            id: 'user1',
-            email: 'user@example.com',
-            firstName: 'Demo',
-            lastName: 'User',
-            role: 'user',
-            isVerified: true
-          });
-          onClose();
-          resetForm();
-        } else {
-          setMessage({ type: 'error', text: 'Invalid credentials. Please check your email and password.' });
-        }
-      } else if (mode === 'admin-create') {
-        // Only admins can create admin accounts
-        if (currentUser?.role !== 'admin') {
-          setMessage({ type: 'error', text: 'Only admins can create admin accounts' });
+        if (!res.ok) {
+          const data = await res.json();
+          setMessage({ type: 'error', text: data.message || 'Registration failed' });
           setLoading(false);
           return;
         }
-        
-        setMessage({ 
-          type: 'success', 
-          text: 'Admin account created successfully!' 
-        });
+        setMessage({ type: 'success', text: 'Registration successful! Your account requires admin verification before you can log in.' });
+        setMode('login');
+        setLoading(false);
+        return;
       }
+      // Login
+      if (mode === 'login') {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setMessage({ type: 'error', text: data.message || 'Login failed' });
+          setLoading(false);
+          return;
+        }
+        // Store JWT and user info
+        localStorage.setItem('fintechUser', JSON.stringify({ ...data.user, token: data.token }));
+        onAuthSuccess({ ...data.user, token: data.token });
+        onClose();
+        resetForm();
+        setLoading(false);
+        return;
+      }
+      // ... existing code for admin-create ...
     } catch (error) {
       setMessage({ type: 'error', text: 'An error occurred. Please try again.' });
     } finally {
@@ -177,7 +157,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
                 placeholder="Enter your email"
                 required
               />
@@ -197,7 +177,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
                     placeholder="First name"
                     required
                   />
@@ -211,7 +191,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
                   placeholder="Last name"
                   required
                 />
@@ -322,7 +302,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                 type="password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
                 placeholder="Enter your password"
                 required
                 minLength={6}
@@ -342,12 +322,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
                   type="password"
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Confirm your password"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
+                  placeholder="Confirm password"
                   required
                   minLength={6}
                 />
               </div>
+            </div>
+          )}
+
+          {mode === 'register' && (
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Register as</label>
+              <select
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                value={registerRole}
+                onChange={e => setRegisterRole(e.target.value as 'editor' | 'viewer')}
+              >
+                <option value="viewer">Viewer</option>
+                <option value="editor">Editor</option>
+              </select>
             </div>
           )}
 

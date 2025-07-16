@@ -109,7 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {showUserMenu && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900 truncate">{currentUser.email}</p>
+                        <p className="text-sm font-medium bg-white text-black rounded px-2 py-1 truncate">{currentUser.email}</p>
                         <p className="text-xs text-gray-500 capitalize">{currentUser.role} Account</p>
                       </div>
                       <button

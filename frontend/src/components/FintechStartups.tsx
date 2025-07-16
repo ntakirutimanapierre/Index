@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Building2, Globe, Calendar, User, Search, Filter } from 'lucide-react';
-import { FintechStartup } from '../types';
+import type { FintechStartup } from '../types';
 
 interface FintechStartupsProps {
   currentUser: any;
@@ -45,7 +45,15 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
     website: ''
   });
 
-  const countries = ['Nigeria', 'Kenya', 'South Africa', 'Egypt', 'Ghana', 'Morocco', 'Ethiopia', 'Tanzania'];
+  // Replace with a full list of African countries
+  const countries = [
+    'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cameroon', 'Central African Republic',
+    'Chad', 'Comoros', 'Congo', 'Democratic Republic of the Congo', 'Djibouti', 'Egypt', 'Equatorial Guinea', 'Eritrea',
+    'Eswatini', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Ivory Coast', 'Kenya', 'Lesotho',
+    'Liberia', 'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique', 'Namibia',
+    'Niger', 'Nigeria', 'Rwanda', 'Sao Tome and Principe', 'Senegal', 'Seychelles', 'Sierra Leone', 'Somalia', 'South Africa',
+    'South Sudan', 'Sudan', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'
+  ];
   const sectors = ['Payments', 'Mobile Money', 'Lending', 'Insurance', 'Investment', 'Banking', 'Blockchain', 'RegTech'];
 
   const handleAddStartup = (e: React.FormEvent) => {
@@ -97,7 +105,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
           </div>
         </div>
 
-        {currentUser && (
+        {(currentUser && (currentUser.role === 'admin' || currentUser.role === 'editor' || currentUser.role === 'viewer')) && (
           <button
             onClick={() => setShowAddForm(true)}
             className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -117,14 +125,14 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
             placeholder="Search startups..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
           />
         </div>
 
         <select
           value={selectedCountry}
           onChange={(e) => setSelectedCountry(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900"
         >
           <option value="">All Countries</option>
           {countries.map(country => (
@@ -135,7 +143,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
         <select
           value={selectedSector}
           onChange={(e) => setSelectedSector(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900"
         >
           <option value="">All Sectors</option>
           {sectors.map(sector => (
@@ -154,14 +162,14 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
               placeholder="Startup Name"
               value={newStartup.name}
               onChange={(e) => setNewStartup({ ...newStartup, name: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
               required
             />
 
             <select
               value={newStartup.country}
               onChange={(e) => setNewStartup({ ...newStartup, country: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900"
               required
             >
               <option value="">Select Country</option>
@@ -173,7 +181,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
             <select
               value={newStartup.sector}
               onChange={(e) => setNewStartup({ ...newStartup, sector: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900"
               required
             >
               <option value="">Select Sector</option>
@@ -187,7 +195,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
               placeholder="Founded Year"
               value={newStartup.foundedYear}
               onChange={(e) => setNewStartup({ ...newStartup, foundedYear: parseInt(e.target.value) })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
               min="1990"
               max={new Date().getFullYear()}
               required
@@ -198,14 +206,14 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
               placeholder="Website (optional)"
               value={newStartup.website}
               onChange={(e) => setNewStartup({ ...newStartup, website: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent md:col-span-2"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-white bg-gray-900 placeholder-gray-300"
             />
 
             <textarea
               placeholder="Description"
               value={newStartup.description}
               onChange={(e) => setNewStartup({ ...newStartup, description: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent md:col-span-2"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-2 text-white bg-gray-900 placeholder-gray-300"
               rows={3}
               required
             />
