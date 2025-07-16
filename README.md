@@ -89,7 +89,7 @@ A comprehensive full-stack web application for tracking and analyzing fintech de
    ```env
    # Backend .env
    MONGODB_URI=mongodb://localhost:27017/african-fintech-index
-   JWT_SECRET=your-secret-key
+   JWT_SECRET=secret-key-here
    PORT=5000
    ```
 
@@ -138,8 +138,8 @@ A comprehensive full-stack web application for tracking and analyzing fintech de
    # Install bcrypt-cli globally
    npm install -g bcrypt-cli
    
-   # Generate hash for your password
-   bcrypt "your-secure-password"
+   # Generate hash for the password
+   bcrypt "secure-password-here"
    ```
 
 ### Method 2: Using the Application Registration
@@ -157,7 +157,7 @@ A comprehensive full-stack web application for tracking and analyzing fintech de
    
    # Update the user to verified status
    db.users.updateOne(
-     { email: "your-admin-email@example.com" },
+     { email: "admin-email@example.com" },
      { 
        $set: { 
          isVerified: true,
@@ -225,9 +225,9 @@ A comprehensive full-stack web application for tracking and analyzing fintech de
 
 ### Admin User Credentials
 
-After creating your admin user, you can sign in with:
-- **Email**: admin@africanfintech.com (or your chosen email)
-- **Password**: your-secure-password
+After creating the admin user, sign in with:
+- **Email**: admin@africanfintech.com (or chosen email)
+- **Password**: secure-password-here
 
 ### Admin Capabilities
 
@@ -242,7 +242,7 @@ Once logged in as admin, you can:
 ### Security Best Practices
 
 1. **Use a strong password** (minimum 12 characters with mixed case, numbers, symbols)
-2. **Change default admin email** to your organization's domain
+2. **Change default admin email** to the organization's domain
 3. **Enable two-factor authentication** if available
 4. **Regular password rotation** (every 90 days)
 5. **Monitor admin account activity**
@@ -250,14 +250,14 @@ Once logged in as admin, you can:
 
 ### Troubleshooting
 
-**If you can't sign in:**
-- Check if the user exists: `db.users.findOne({email: "your-email"})`
-- Verify the user is verified: `db.users.findOne({email: "your-email", isVerified: true})`
-- Reset password if needed: `db.users.updateOne({email: "your-email"}, {$set: {password: "new-hash"}})`
+**If unable to sign in:**
+- Check if the user exists: `db.users.findOne({email: "admin-email"})`
+- Verify the user is verified: `db.users.findOne({email: "admin-email", isVerified: true})`
+- Reset password if needed: `db.users.updateOne({email: "admin-email"}, {$set: {password: "new-hash"}})`
 
 **If the role isn't working:**
-- Verify role field: `db.users.findOne({email: "your-email"}).role`
-- Update role if needed: `db.users.updateOne({email: "your-email"}, {$set: {role: "admin"}})`
+- Verify role field: `db.users.findOne({email: "admin-email"}).role`
+- Update role if needed: `db.users.updateOne({email: "admin-email"}, {$set: {role: "admin"}})`
 
 ## 📁 Project Structure
 
