@@ -117,7 +117,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input
@@ -154,9 +154,9 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
 
       {/* Add Startup Form */}
       {showAddForm && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Fintech Startup</h3>
-          <form onSubmit={handleAddStartup} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Add New Fintech Startup</h3>
+          <form onSubmit={handleAddStartup} className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <input
               type="text"
               placeholder="Startup Name"
@@ -213,12 +213,12 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
               placeholder="Description"
               value={newStartup.description}
               onChange={(e) => setNewStartup({ ...newStartup, description: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-2 text-white bg-gray-900 placeholder-gray-300"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent col-span-1 sm:col-span-2 text-white bg-gray-900 placeholder-gray-300"
               rows={3}
               required
             />
 
-            <div className="md:col-span-2 flex space-x-3">
+            <div className="col-span-1 sm:col-span-2 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <button
                 type="submit"
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -238,30 +238,30 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
       )}
 
       {/* Startups Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredStartups.map((startup) => (
-          <div key={startup.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div key={startup.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">{startup.name}</h3>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 mr-2">{startup.name}</h3>
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full flex-shrink-0">
                 {startup.sector}
               </span>
             </div>
 
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{startup.description}</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">{startup.description}</p>
 
-            <div className="space-y-2 text-sm text-gray-500">
+            <div className="space-y-2 text-xs sm:text-sm text-gray-500">
               <div className="flex items-center space-x-2">
-                <Globe className="w-4 h-4" />
-                <span>{startup.country}</span>
+                <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="truncate">{startup.country}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                 <span>Founded {startup.foundedYear}</span>
               </div>
               <div className="flex items-center space-x-2">
-                <User className="w-4 h-4" />
-                <span>Added by {startup.addedBy}</span>
+                <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                <span className="truncate">Added by {startup.addedBy}</span>
               </div>
             </div>
 
@@ -270,7 +270,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
                 href={startup.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block mt-3 text-green-600 hover:text-green-700 text-sm font-medium"
+                className="inline-block mt-3 text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium"
               >
                 Visit Website →
               </a>

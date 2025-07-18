@@ -1,16 +1,21 @@
-import React from 'react';
-import { Database, Trash2, Info, Calendar, User, Hash } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Database, Trash2, Info, Calendar, User, Hash, AlertTriangle } from 'lucide-react';
+import type { CountryData } from '../types';
 
 interface DataManagementProps {
   getDataInfo: () => any;
   clearData: () => void;
   isAuthenticated: boolean;
+  data?: CountryData[];
+  updateData?: (newData: CountryData[]) => void;
 }
 
 export const DataManagement: React.FC<DataManagementProps> = ({ 
   getDataInfo, 
   clearData, 
-  isAuthenticated 
+  isAuthenticated,
+  data = [],
+  updateData
 }) => {
   const dataInfo = getDataInfo();
 

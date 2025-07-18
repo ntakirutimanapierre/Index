@@ -21,7 +21,13 @@ const DataManagementPage: React.FC = () => {
       <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10">
         <h1 className="text-2xl font-bold mb-4">Data Management</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <DataManagement getDataInfo={getDataInfo} clearData={clearData} isAuthenticated={true} />
+          <DataManagement 
+            getDataInfo={getDataInfo} 
+            clearData={clearData} 
+            isAuthenticated={true}
+            data={data}
+            updateData={updateData}
+          />
           <FileUpload onDataUpdate={updateData} currentYear={selectedYear} />
         </div>
       </main>

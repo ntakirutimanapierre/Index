@@ -181,37 +181,20 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
-      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-indigo-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-300/10 to-purple-300/10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10 relative z-10">
           {/* Stats Overview */}
           <StatsCards stats={currentStats} />
-          {/* Map Type Toggle */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col md:flex-row md:items-center md:space-x-6 space-y-2 md:space-y-0">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={useNewMap}
-                onChange={(e) => setUseNewMap(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                Use Enhanced Map (with shapefile support)
-              </span>
-            </label>
-            {useNewMap && (
-              <div className="text-sm text-gray-600">
-                Shapefile: <code className="bg-gray-100 px-2 py-1 rounded">src/data/ne_110m_admin_0_countries.shp</code>
-              </div>
-            )}
-            <div className="text-sm text-gray-600 md:ml-auto">
-              <strong>Status:</strong> {useNewMap 
-                ? 'Using enhanced map with shapefile data support' 
-                : 'Using original simplified map'}
-            </div>
-          </div>
           {/* Admin Data Management */}
           {currentUser?.role === 'admin' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               <DataManagement 
                 getDataInfo={getDataInfo}
                 clearData={clearData}
@@ -226,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
           {/* Sub-component Cards */}
           <SubComponentCards data={currentData} />
           {/* Interactive Analytics */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <InteractiveChart 
               data={currentData} 
               allYearsData={countryData} 
@@ -234,8 +217,8 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
             />
           </div>
           {/* Main Content Grid - Map and News */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 flex items-center justify-center">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="xl:col-span-2 flex items-center justify-center">
               {useNewMap ? (
                 <AfricaMapComplete 
                   data={currentData}
@@ -253,39 +236,39 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
                 />
               )}
             </div>
-            <div className="lg:col-span-1 h-[600px] bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="xl:col-span-1 h-[400px] sm:h-[500px] lg:h-[600px] bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
               <FinanceNews />
             </div>
           </div>
           {/* Fintech Startups */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <FintechStartups currentUser={currentUser} />
           </div>
           {/* Country Rankings Table */}
           {currentData.length > 0 ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
               <CountryTable data={currentData} />
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-12 text-center">
               <div className="text-gray-400 mb-4">
-                <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
-              <p className="text-gray-600 mb-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Data Available</h3>
+              <p className="text-sm sm:text-base text-gray-600 mb-4">
                 {currentUser?.role === 'admin' 
                   ? `Upload a CSV or Excel file to see country rankings for ${selectedYear}`
                   : `Admin login required to upload data for ${selectedYear}`}
               </p>
-              <p className="text-sm text-gray-500">Make sure to include year and fintech companies data in your file</p>
+              <p className="text-xs sm:text-sm text-gray-500">Make sure to include year and fintech companies data in your file</p>
             </div>
           )}
           {/* Admin: Unverified Users */}
           {currentUser?.role === 'admin' && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-              <h3 className="text-lg font-semibold mb-4 text-black">Unverified Users</h3>
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 text-black">Unverified Users</h3>
               {loadingUnverified ? (
                 <p>Loading...</p>
               ) : unverifiedUsers.length === 0 ? (
@@ -293,12 +276,12 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
               ) : (
                 <ul className="space-y-2">
                   {unverifiedUsers.map(user => (
-                    <li key={user._id} className="flex items-center justify-between border-b pb-2">
-                      <span className="text-black">
+                    <li key={user._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-2 gap-2">
+                      <span className="text-black text-sm sm:text-base">
                         {user.email} ({user.role})
                       </span>
                       <button
-                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm w-fit"
                         onClick={() => handleVerifyUser(user._id)}
                       >
                         Verify
@@ -311,8 +294,59 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
           )}
           {/* Admin: All Users */}
           {currentUser?.role === 'admin' && (
-            <div id="user-management" className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-              <h3 className="text-lg font-semibold mb-4">All Users</h3>
+            <div id="user-management" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4">All Users</h3>
+              {/* Register New User Form */}
+              <div className="mb-6">
+                <h4 className="text-sm sm:text-md font-semibold mb-2">Register New User</h4>
+                <form
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!currentUser?.token) return;
+                    const form = e.target as HTMLFormElement;
+                    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
+                    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
+                    const password = (form.elements.namedItem('password') as HTMLInputElement).value;
+                    const role = (form.elements.namedItem('role') as HTMLSelectElement).value;
+                    try {
+                      const res = await fetch('/api/users', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${currentUser.token}`,
+                        },
+                        body: JSON.stringify({ name, email, password, role }),
+                      });
+                      if (!res.ok) throw new Error('Failed to register user');
+                      setNotification({ type: 'success', message: 'User registered successfully.' });
+                      setLoadingUsers(true);
+                      fetch('/api/users', {
+                        headers: { Authorization: `Bearer ${currentUser.token}` },
+                      })
+                        .then(res => res.json())
+                        .then(data => {
+                          setAllUsers(data);
+                          setLoadingUsers(false);
+                        })
+                        .catch(() => setLoadingUsers(false));
+                      form.reset();
+                    } catch (err) {
+                      setNotification({ type: 'error', message: (err as Error).message });
+                    }
+                  }}
+                >
+                  <input name="name" type="text" className="border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Full Name" required />
+                  <input name="email" type="email" className="border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Email" required />
+                  <input name="password" type="password" className="border border-gray-300 rounded px-3 py-2 text-sm" placeholder="Password" required minLength={6} />
+                  <select name="role" className="border border-gray-300 rounded px-3 py-2 text-sm" required defaultValue="viewer">
+                    <option value="viewer">Viewer</option>
+                    <option value="editor">Editor</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button type="submit" className="col-span-1 sm:col-span-2 bg-blue-600 text-white rounded px-4 py-2 mt-2 hover:bg-blue-700 transition text-sm">Register</button>
+                </form>
+              </div>
               {loadingUsers ? (
                 <p>Loading...</p>
               ) : allUsers.length === 0 ? (
@@ -320,12 +354,12 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
               ) : (
                 <ul className="space-y-2">
                   {notification && (
-                    <div className={`mb-4 p-3 rounded ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{notification.message}</div>
+                    <div className={`mb-4 p-3 rounded text-sm ${notification.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>{notification.message}</div>
                   )}
                   {/* User search/filter */}
                   <div className="mb-4">
                     <input
-                      className="w-full border border-gray-300 rounded px-3 py-2"
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                       placeholder="Search users by email or name..."
                       value={userSearch}
                       onChange={e => setUserSearch(e.target.value)}
@@ -335,19 +369,19 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
                     user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
                     (user.name && user.name.toLowerCase().includes(userSearch.toLowerCase()))
                   ).map(user => (
-                    <li key={user._id} className="flex items-center justify-between border-b pb-2">
-                      <span className={user.isVerified ? 'text-black' : 'text-gray-500'}>
+                    <li key={user._id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b pb-2 gap-2">
+                      <span className={`text-sm sm:text-base ${user.isVerified ? 'text-black' : 'text-gray-500'}`}>
                         {user.email} ({user.role}) {user.isVerified ? <span className="text-green-600">✔️</span> : <span className="text-red-600">❌</span>}
                       </span>
                       <div className="flex gap-2">
                         <button
-                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                           onClick={() => handleEditUser(user)}
                         >
                           Edit
                         </button>
                         <button
-                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+                          className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
                           onClick={() => handleDeleteUser(user._id)}
                         >
                           Delete

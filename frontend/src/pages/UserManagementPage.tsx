@@ -11,6 +11,33 @@ const UserManagementPage: React.FC = () => {
   const [editForm, setEditForm] = useState({ name: '', role: 'viewer', isVerified: false });
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [userSearch, setUserSearch] = useState('');
+  const [registerForm, setRegisterForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    country: '',
+    organization: '',
+    jobTitle: '',
+    phoneNumber: '',
+    role: 'viewer'
+  });
+  const [countrySearch, setCountrySearch] = useState('');
+  const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
+
+  const countries = [
+    'Nigeria', 'South Africa', 'Kenya', 'Egypt', 'Ghana', 'Morocco', 'Ethiopia', 'Tanzania',
+    'Uganda', 'Rwanda', 'Senegal', 'Ivory Coast', 'Tunisia', 'Algeria', 'Cameroon', 'Zimbabwe',
+    'Zambia', 'Botswana', 'Namibia', 'Mauritius', 'Mali', 'Burkina Faso', 'Niger', 'Chad',
+    'Central African Republic', 'Democratic Republic of Congo', 'Republic of Congo', 'Gabon',
+    'Equatorial Guinea', 'São Tomé and Príncipe', 'Angola', 'Mozambique', 'Madagascar',
+    'Malawi', 'Lesotho', 'Eswatini', 'Comoros', 'Seychelles', 'Mauritania', 'Western Sahara',
+    'Libya', 'Sudan', 'South Sudan', 'Eritrea', 'Djibouti', 'Somalia', 'Other'
+  ];
+
+  const sortedCountries = countries.slice().sort((a, b) => a.localeCompare(b));
+  const filteredCountries = sortedCountries.filter(country => country.toLowerCase().includes(countrySearch.toLowerCase()));
 
   useEffect(() => {
     const stored = localStorage.getItem('fintechUser');
@@ -147,6 +174,255 @@ const UserManagementPage: React.FC = () => {
         {/* All Users */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 w-full">
           <h3 className="text-lg font-semibold mb-4 text-black">All Users</h3>
+          {/* Register New User Form */}
+          <div className="mb-6">
+            <h4 className="text-md font-semibold mb-2">Register New User</h4>
+            <form
+              className="space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!currentUser?.token) return;
+                
+                // Validation
+                if (registerForm.password !== registerForm.confirmPassword) {
+                  setNotification({ type: 'error', message: 'Passwords do not match' });
+                  return;
+                }
+                if (!registerForm.firstName || !registerForm.lastName || !registerForm.country) {
+                  setNotification({ type: 'error', message: 'Please fill in all required fields' });
+                  return;
+                }
+                
+                try {
+                  const res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      Authorization: `Bearer ${currentUser.token}`,
+                    },
+                    body: JSON.stringify({
+                      name: registerForm.firstName + ' ' + registerForm.lastName,
+                      email: registerForm.email,
+                      password: registerForm.password,
+                      role: registerForm.role,
+                      country: registerForm.country,
+                      organization: registerForm.organization,
+                      jobTitle: registerForm.jobTitle,
+                      phoneNumber: registerForm.phoneNumber,
+                    }),
+                  });
+                  if (!res.ok) throw new Error('Failed to register user');
+                  setNotification({ type: 'success', message: 'User registered successfully.' });
+                  setLoadingUsers(true);
+                  fetch('/api/users', {
+                    headers: { Authorization: `Bearer ${currentUser.token}` },
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      setAllUsers(data);
+                      setLoadingUsers(false);
+                    })
+                    .catch(() => setLoadingUsers(false));
+                  // Reset form
+                  setRegisterForm({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    country: '',
+                    organization: '',
+                    jobTitle: '',
+                    phoneNumber: '',
+                    role: 'viewer'
+                  });
+                } catch (err) {
+                  setNotification({ type: 'error', message: (err as Error).message });
+                }
+              }}
+            >
+              {/* Name fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={registerForm.firstName}
+                    onChange={(e) => setRegisterForm({ ...registerForm, firstName: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="First name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={registerForm.lastName}
+                    onChange={(e) => setRegisterForm({ ...registerForm, lastName: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Last name"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email Address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={registerForm.email}
+                  onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+
+              {/* Country */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Country <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={countrySearch}
+                    onChange={e => {
+                      setCountrySearch(e.target.value);
+                      setRegisterForm({ ...registerForm, country: '' });
+                      setCountryDropdownOpen(true);
+                    }}
+                    onFocus={() => setCountryDropdownOpen(true)}
+                    onBlur={() => setTimeout(() => setCountryDropdownOpen(false), 100)}
+                    placeholder="Search country..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    autoComplete="off"
+                    required
+                  />
+                  {countryDropdownOpen && filteredCountries.length > 0 && (
+                    <ul className="absolute left-0 right-0 mt-1 max-h-48 overflow-auto bg-white border border-gray-300 rounded-lg shadow-lg z-20">
+                      {filteredCountries.map(country => (
+                        <li
+                          key={country}
+                          className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+                          onMouseDown={() => {
+                            setCountrySearch(country);
+                            setRegisterForm({ ...registerForm, country });
+                            setCountryDropdownOpen(false);
+                          }}
+                        >
+                          {country}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* Organization */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Organization
+                </label>
+                <input
+                  type="text"
+                  value={registerForm.organization}
+                  onChange={(e) => setRegisterForm({ ...registerForm, organization: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Company or organization"
+                />
+              </div>
+
+              {/* Job Title and Phone Number */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    value={registerForm.jobTitle}
+                    onChange={(e) => setRegisterForm({ ...registerForm, jobTitle: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Your role"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={registerForm.phoneNumber}
+                    onChange={(e) => setRegisterForm({ ...registerForm, phoneNumber: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="+1234567890"
+                  />
+                </div>
+              </div>
+
+              {/* Password fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={registerForm.password}
+                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Confirm Password <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={registerForm.confirmPassword}
+                    onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Confirm password"
+                    required
+                    minLength={6}
+                  />
+                </div>
+              </div>
+
+              {/* Role */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={registerForm.role}
+                  onChange={(e) => setRegisterForm({ ...registerForm, role: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                >
+                  <option value="viewer">Viewer</option>
+                  <option value="editor">Editor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+
+              <button type="submit" className="w-full bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700 transition">
+                Register User
+              </button>
+            </form>
+          </div>
           {loadingUsers ? (
             <p>Loading...</p>
           ) : allUsers.length === 0 ? (

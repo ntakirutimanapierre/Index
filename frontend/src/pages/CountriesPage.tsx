@@ -11,36 +11,35 @@ const CountriesPage: React.FC<{ selectedYear: number; onYearChange: (year: numbe
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex flex-col">
-      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10">
-        <h1 className="text-2xl font-bold mb-4">Countries</h1>
-        <div className="mb-4">
-          <label className="mr-2 font-medium">Year:</label>
+      <main className="flex-1 max-w-7xl mx-auto px-2 sm:px-6 lg:px-12 py-6 sm:py-10 space-y-6 sm:space-y-10 w-full mt-20">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Countries</h1>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-4">
+          <label className="font-medium text-base sm:text-lg">Year:</label>
           <select
             value={selectedYear}
             onChange={e => onYearChange(Number(e.target.value))}
-            className="border rounded px-2 py-1"
+            className="border rounded px-2 py-1 sm:px-3 sm:py-2 text-base sm:text-lg"
           >
             {availableYears.map(year => (
               <option key={year} value={year}>{year}</option>
             ))}
           </select>
         </div>
-        {/* Responsive flex row for map and table */}
-        <div className="mb-8 w-full flex flex-col lg:flex-row gap-8 px-2 sm:px-4 lg:px-8">
-          <div className="w-full lg:w-1/2">
-            <AfricaMapComplete
-              data={currentData}
-              shapefilePath={getLocalShapefilePath()}
-              width={800}
-              height={600}
-              hoveredCountry={hoveredCountry}
-              onCountryHover={setHoveredCountry}
-            />
-          </div>
-          <div className="w-full lg:w-1/2">
-            <CountryTable data={currentData} />
-          </div>
-        </div>
+        {/* Map Card */}
+        <section className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-0 sm:p-4 mx-auto max-w-full sm:max-w-4xl lg:max-w-7xl relative" style={{ minHeight: 320 }}>
+          <AfricaMapComplete
+            data={currentData}
+            shapefilePath={getLocalShapefilePath()}
+            width={undefined}
+            height={undefined}
+            hoveredCountry={hoveredCountry}
+            onCountryHover={setHoveredCountry}
+          />
+        </section>
+        {/* Table Card */}
+        <section className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-2 sm:p-6 mx-auto max-w-full overflow-x-auto">
+          <CountryTable data={currentData} />
+        </section>
       </main>
     </div>
   );

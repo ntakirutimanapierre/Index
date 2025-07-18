@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="flex items-center space-x-2">
                 <Award className="w-4 h-4 flex-shrink-0" />
-                <span className="font-medium">Funded by AFRETECH NETWORK</span>
+                <span className="font-medium">Funded by AFRETEC NETWORK</span>
               </div>
             </div>
             <div className="flex items-center space-x-4 text-xs">
@@ -49,23 +49,28 @@ export const Header: React.FC<HeaderProps> = ({
       </div> */}
 
       {/* Main Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 shadow-lg border-b border-blue-500/20 fixed top-0 left-0 right-0 z-50 h-20 flex items-center w-full backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo and Title */}
-            <div className="flex items-center space-x-3 min-w-0">
-              <img
-                src="/logo.jpg"
-                alt="African Fintech Index Logo"
-                className="w-12 h-12 object-contain rounded-lg shadow-sm bg-white border border-gray-200 flex-shrink-0"
-                style={{ background: 'white' }}
-              />
-              <div className="hidden sm:block min-w-0">
-                <h1 className="text-xl font-bold text-gray-900 truncate">African Fintech Index</h1>
-                <p className="text-sm text-gray-500 truncate">Financial Technology Development Across Africa</p>
+            <div className="flex items-center space-x-4 min-w-0 w-full">
+              <div className="relative">
+                <img
+                  src="/logo.jpg"
+                  alt="African Fintech Index Logo"
+                  className="w-14 h-14 object-contain rounded-xl shadow-lg bg-white/10 backdrop-blur-sm border-2 border-white/20 flex-shrink-0 transition-transform hover:scale-105"
+                  style={{ background: 'white' }}
+                />
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
               </div>
-              <div className="sm:hidden">
-                <h1 className="text-lg font-bold text-gray-900">AFI</h1>
+              {/* Responsive Title and Tagline */}
+              <div className="flex flex-col items-start sm:items-start w-full">
+                <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight mb-0 sm:mb-0 text-left w-full bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent drop-shadow-lg">
+                  African Fintech Index
+                </h1>
+                <p className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl font-medium text-blue-100 leading-snug mt-0 sm:mt-0 text-left w-full drop-shadow-md">
+                  Financial Technology Development Across Africa
+                </p>
               </div>
             </div>
 
@@ -137,6 +142,14 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             {/* Mobile/Tablet Controls */}
             <div className="lg:hidden flex items-center space-x-3">
+              {/* Sidebar Hamburger for Mobile */}
+              <button
+                className="block lg:hidden bg-white rounded-full p-2 shadow border border-gray-200 mr-2"
+                onClick={() => window.dispatchEvent(new CustomEvent('sidebar-toggle'))}
+                aria-label="Open sidebar"
+              >
+                <Menu className="w-6 h-6 text-blue-700" />
+              </button>
               {/* Year Selector for Mobile */}
               <div className="relative">
                 <select
@@ -150,12 +163,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </select>
                 <ChevronDown className="absolute right-1 top-1/2 transform -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
               </div>
-              <button
-                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                {showMobileMenu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
             </div>
           </div>
         </div>

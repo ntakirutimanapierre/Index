@@ -3,7 +3,14 @@ import { Globe, Mail, Phone, MapPin, ExternalLink, Linkedin, Twitter, Facebook, 
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-indigo-600/10"></div>
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-full blur-2xl"></div>
+      </div>
+      
       {/* Partnership Banner */}
       <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-red-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -72,24 +79,24 @@ export const Footer: React.FC = () => {
             </div>
             <div className="flex items-center justify-center space-x-3 p-4 bg-white bg-opacity-10 rounded-lg backdrop-blur-sm">
               <Award className="w-6 h-6 text-yellow-300" />
-              <span className="text-lg font-semibold">Proudly Funded by AFRETECH NETWORK</span>
+              <span className="text-lg font-semibold">Proudly Funded by AFRETEC NETWORK</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Project Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-                <Globe className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg">
+                <Globe className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">African Fintech Index</h3>
-                <p className="text-gray-400 text-sm">Multi-University Research Initiative</p>
+                <h3 className="text-2xl font-black bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">African Fintech Index</h3>
+                <p className="text-blue-200 text-sm font-medium">Multi-University Research Initiative</p>
               </div>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed mb-6">
@@ -98,17 +105,17 @@ export const Footer: React.FC = () => {
             </p>
             {/* Social Links */}
             <div className="flex space-x-4">
-              <a href="#" className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
-                <Linkedin className="w-5 h-5" />
+              <a href="#" className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110">
+                <Linkedin className="w-6 h-6" />
               </a>
-              <a href="#" className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-400 transition-colors">
-                <Twitter className="w-5 h-5" />
+              <a href="#" className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-400 rounded-xl flex items-center justify-center hover:from-blue-300 hover:to-purple-300 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110">
+                <Twitter className="w-6 h-6" />
               </a>
-              <a href="#" className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-blue-700 transition-colors">
-                <Facebook className="w-5 h-5" />
+              <a href="#" className="w-12 h-12 bg-gradient-to-r from-blue-700 to-purple-700 rounded-xl flex items-center justify-center hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110">
+                <Facebook className="w-6 h-6" />
               </a>
-              <a href="#" className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-red-600 transition-colors">
-                <Youtube className="w-5 h-5" />
+              <a href="#" className="w-12 h-12 bg-gradient-to-r from-red-600 to-purple-600 rounded-xl flex items-center justify-center hover:from-red-500 hover:to-purple-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-110">
+                <Youtube className="w-6 h-6" />
               </a>
             </div>
           </div>
@@ -313,7 +320,7 @@ export const Footer: React.FC = () => {
           <div className="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
             <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-4 text-sm text-gray-400">
               <p>&copy; 2024 University Partnership. All rights reserved.</p>
-              <p className="text-xs">Funded by AFRETECH NETWORK</p>
+              <p className="text-xs">Funded by AFRETEC NETWORK</p>
             </div>
             
             <div className="flex flex-wrap items-center justify-center space-x-4 lg:space-x-6 text-sm text-gray-400">

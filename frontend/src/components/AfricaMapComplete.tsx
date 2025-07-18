@@ -213,20 +213,20 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
   };
 
   return (
-    <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-xl flex flex-col p-6" style={{ aspectRatio: '1 / 1', width: '100%', maxWidth: 900 }}>
+    <div className="bg-gray-50 rounded-xl border border-gray-200 shadow-xl flex flex-col p-6 relative" style={{ width: '100%', minHeight: 500 }}>
       <div className="p-6 pb-4 flex-shrink-0">
         <h3 className="text-xl font-bold text-gray-900">Africa Fintech Index Map</h3>
         {loading && <p className="text-sm text-blue-300 mt-1">Loading map...</p>}
         {error && <p className="text-sm text-red-400 mt-1">Error: {error}</p>}
       </div>
-      <div className="flex-1 px-6 flex flex-col min-h-0">
-        <div className="flex-1 min-h-0 mb-4 flex items-center justify-center" style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)', width: '100%', height: '100%' }}>
+      <div className="flex-1 flex flex-col min-h-0 relative">
+        <div className="flex-1 min-h-0 mb-4 flex items-center justify-center relative" style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)', width: '100%', height: '100%' }}>
           {loading ? (
             <div className="flex items-center justify-center h-full">
               <span className="text-gray-500">Loading map...</span>
             </div>
           ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
               <svg
                 ref={svgRef}
                 viewBox="250 100 600 700"
@@ -285,68 +285,56 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
                   )}
                 </div>
               )}
+              {/* Floating country info card overlay */}
+              {hoveredCountry && (
+                <div className="absolute top-6 right-6 z-40 w-96 max-w-full">
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 shadow-lg">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {hoveredCountry.finalScore.toFixed(1)}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="bg-white p-2 rounded">
+                        <div className="text-gray-600">Literacy Rate</div>
+                        <div className="font-semibold text-blue-600">
+                          {hoveredCountry.literacyRate.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div className="bg-white p-2 rounded">
+                        <div className="text-gray-600">Digital Infra</div>
+                        <div className="font-semibold text-green-600">
+                          {hoveredCountry.digitalInfrastructure.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div className="bg-white p-2 rounded">
+                        <div className="text-gray-600">Investment</div>
+                        <div className="font-semibold text-purple-600">
+                          {hoveredCountry.investment.toFixed(1)}%
+                        </div>
+                      </div>
+                      <div className="bg-white p-2 rounded">
+                        <div className="text-gray-600">Fintech Cos</div>
+                        <div className="font-semibold text-orange-600">
+                          {hoveredCountry.fintechCompanies || 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {/* Floating legend overlay bottom left */}
+              <div className="absolute bottom-6 left-6 z-30 bg-white/90 rounded-lg shadow px-6 py-2 flex gap-6 border border-gray-200">
+                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-emerald-500 border border-gray-700"></span><span className="text-xs text-black">High (80+)</span></div>
+                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-yellow-400 border border-gray-700"></span><span className="text-xs text-black">Medium (60-79)</span></div>
+                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-red-400 border border-gray-700"></span><span className="text-xs text-black">Low (40-59)</span></div>
+                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-gray-400 border border-gray-700"></span><span className="text-xs text-black">Very Low (&lt;40)</span></div>
+              </div>
             </div>
           )}
         </div>
-        {/* Color Legend */}
-        <div className="flex items-center justify-center gap-6 py-2">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-5 h-5 rounded bg-emerald-500 border border-gray-700"></span>
-            <span className="text-xs text-black">High (80+)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-5 h-5 rounded bg-yellow-400 border border-gray-700"></span>
-            <span className="text-xs text-black">Medium (60-79)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-5 h-5 rounded bg-red-400 border border-gray-700"></span>
-            <span className="text-xs text-black">Low (40-59)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-5 h-5 rounded bg-gray-400 border border-gray-700"></span>
-            <span className="text-xs text-black">Very Low (&lt;40)</span>
-          </div>
-        </div>
       </div>
-
-      {hoveredCountry && (
-        <div className="p-6 pt-0 flex-shrink-0">
-          <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
-              <div className="text-2xl font-bold text-blue-600">
-                {hoveredCountry.finalScore.toFixed(1)}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Literacy Rate</div>
-                <div className="font-semibold text-blue-600">
-                  {hoveredCountry.literacyRate.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Digital Infra</div>
-                <div className="font-semibold text-green-600">
-                  {hoveredCountry.digitalInfrastructure.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Investment</div>
-                <div className="font-semibold text-purple-600">
-                  {hoveredCountry.investment.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Fintech Cos</div>
-                <div className="font-semibold text-orange-600">
-                  {hoveredCountry.fintechCompanies || 'N/A'}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
