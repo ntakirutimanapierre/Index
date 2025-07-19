@@ -148,7 +148,7 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
     return { centerX, centerY };
   }
 
-  return (
+    return (
     <div className="w-full h-full flex items-center justify-center relative" style={{ minHeight: 400 }}>
       {/* Overlay to clear selection when clicking outside the map */}
       {selectedCountry && (
@@ -163,25 +163,25 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
           <span className="text-gray-500">Loading map...</span>
         </div>
       ) : (
-        <svg
-          ref={svgRef}
+      <svg
+        ref={svgRef}
           viewBox="0 0 1000 900"
           width="100%"
           height="100%"
           className="w-full h-full"
-          preserveAspectRatio="xMidYMid meet"
+        preserveAspectRatio="xMidYMid meet"
           style={{ background: 'none' }}
           onClick={e => e.stopPropagation()}
-        >
-          <defs>
-            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      >
+        <defs>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
-            </filter>
-          </defs>
+          </filter>
+        </defs>
           {geoData && geoData.features.map((feature) => {
-            const isoCode = feature.properties.ISO_A2;
-            return renderCountryPath(feature, isoCode);
-          })}
+          const isoCode = feature.properties.ISO_A2;
+          return renderCountryPath(feature, isoCode);
+        })}
           {/* No SVG text labels rendered */}
         </svg>
       )}
@@ -214,19 +214,19 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="bg-blue-50 p-2 rounded">
-                  <div className="text-gray-600">Literacy Rate</div>
+                <div className="text-gray-600">Literacy Rate</div>
                   <div className="font-semibold text-blue-700">{selectedCountry.literacyRate?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-green-50 p-2 rounded">
-                  <div className="text-gray-600">Digital Infra</div>
+                <div className="text-gray-600">Digital Infra</div>
                   <div className="font-semibold text-green-700">{selectedCountry.digitalInfrastructure?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-purple-50 p-2 rounded">
-                  <div className="text-gray-600">Investment</div>
+                <div className="text-gray-600">Investment</div>
                   <div className="font-semibold text-purple-700">{selectedCountry.investment?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-orange-50 p-2 rounded">
-                  <div className="text-gray-600">Fintech Cos</div>
+                <div className="text-gray-600">Fintech Cos</div>
                   <div className="font-semibold text-orange-700">{selectedCountry.fintechCompanies ?? 'N/A'}</div>
                 </div>
               </div>
@@ -235,15 +235,6 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
         }
         return null;
       })()}
-      {/* Floating country list card on the right side */}
-      <div className="absolute top-8 right-8 z-40 w-64 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-gray-200 p-4 flex flex-col gap-2">
-        <h4 className="text-base font-bold mb-2">Countries</h4>
-        <ul className="space-y-1">
-          {Array.from(countryMap.values()).filter(c => c.data).map(({ data }) => (
-            <li key={data!.id} className="text-sm text-gray-800 truncate">{data!.name}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

@@ -63,7 +63,7 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
     const startup: FintechStartup = {
       id: Date.now().toString(),
       ...newStartup,
-      addedBy: currentUser.email,
+      addedBy: currentUser.name || currentUser.email,
       addedAt: Date.now()
     };
 
@@ -251,42 +251,42 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
         <div className="text-red-600">{error}</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full max-w-full overflow-x-hidden">
-          {filteredStartups.map((startup) => (
+        {filteredStartups.map((startup) => (
             <div key={startup.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow w-full max-w-full">
               <div className="flex items-start justify-between mb-3 w-full max-w-full">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 mr-2 truncate">{startup.name}</h3>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full flex-shrink-0 truncate">
-                  {startup.sector}
-                </span>
-              </div>
+                {startup.sector}
+              </span>
+            </div>
               <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 break-words">{startup.description}</p>
               <div className="space-y-2 text-xs sm:text-sm text-gray-500">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2">
                   <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span className="truncate">{startup.country}</span>
-                </div>
-                <div className="flex items-center space-x-2">
+              </div>
+              <div className="flex items-center space-x-2">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span>Founded {startup.foundedYear}</span>
-                </div>
-                <div className="flex items-center space-x-2">
+                <span>Founded {startup.foundedYear}</span>
+              </div>
+              <div className="flex items-center space-x-2">
                   <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="truncate">Added by {startup.addedBy}</span>
+                  <span className="truncate">Added by {startup.addedBy || 'Unknown'}</span>
                 </div>
               </div>
-              {startup.website && (
-                <a
-                  href={startup.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
+            {startup.website && (
+              <a
+                href={startup.website}
+                target="_blank"
+                rel="noopener noreferrer"
                   className="inline-block mt-3 text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium truncate"
-                >
-                  Visit Website →
-                </a>
-              )}
-            </div>
-          ))}
-        </div>
+              >
+                Visit Website →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
       )}
 
       {filteredStartups.length === 0 && (
