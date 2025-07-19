@@ -39,7 +39,7 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
     Map<string, { feature: ShapefileFeature; data: CountryData | null }>
   >(new Map());
   const svgRef = useRef<SVGSVGElement>(null);
-  const [tooltip, setTooltip] = useState<{ x: number; y: number; name: string; score: number | null } | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<CountryData | null>(null);
 
   const loadShapefileData = useCallback(async () => {
     if (!shapefilePath) {
@@ -87,34 +87,19 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
     (isoCode: string) => {
       const countryInfo = countryMap.get(isoCode);
       if (countryInfo?.data) {
-        onCountryHover(countryInfo.data);
+        setSelectedCountry(countryInfo.data);
       }
     },
-    [countryMap, onCountryHover]
+    [countryMap]
   );
 
-  const handleCountryHover = useCallback(
-    (isoCode: string, evt?: React.MouseEvent) => {
-      const countryInfo = countryMap.get(isoCode);
-      onCountryHover(countryInfo?.data || null);
-      if (countryInfo?.data && evt) {
-        setTooltip({
-          x: evt.clientX,
-          y: evt.clientY,
-          name: countryInfo.data.name,
-          score: countryInfo.data.finalScore
-        });
-      } else {
-        setTooltip(null);
-      }
-    },
-    [countryMap, onCountryHover]
-  );
+  // Remove hover logic, only use click
+  const handleCountryHover = () => {};
 
   const renderCountryPath = (feature: ShapefileFeature, isoCode: string) => {
     const countryInfo = countryMap.get(isoCode);
     const color = getCountryColor(countryInfo?.data || null);
-    const isHovered = hoveredCountry && countryInfo?.data && hoveredCountry.id === countryInfo.data.id;
+    const isSelected = selectedCountry && countryInfo?.data && selectedCountry.id === countryInfo.data.id;
 
     let pathData = '';
     if (feature.geometry.type === 'Polygon') {
@@ -131,23 +116,20 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
         key={isoCode}
         d={pathData}
         fill={color}
-        stroke={isHovered ? '#2563eb' : '#222'}
-        strokeWidth={isHovered ? 3 : 1.5}
-        filter={isHovered ? 'url(#shadow)' : undefined}
+        stroke={isSelected ? '#2563eb' : '#222'}
+        strokeWidth={isSelected ? 3 : 1.5}
+        filter={isSelected ? 'url(#shadow)' : undefined}
         className="cursor-pointer hover:opacity-80 transition-all duration-200"
         onClick={() => handleCountryClick(isoCode)}
-        onMouseEnter={(evt) => handleCountryHover(isoCode, evt)}
-        onMouseMove={(evt) => handleCountryHover(isoCode, evt)}
-        onMouseLeave={() => { onCountryHover(null); setTooltip(null); }}
       />
     );
   };
 
-  // Helper to get centroid of hovered country
-  function getHoveredCountryCentroid() {
-    if (!geoData || !hoveredCountry) return null;
-    let feature = geoData.features.find(f => f.properties.ADMIN === hoveredCountry.name);
-    if (!feature && hoveredCountry.name === 'Tanzania') {
+  // Helper to get centroid of selected country
+  function getSelectedCountryCentroid() {
+    if (!geoData || !selectedCountry) return null;
+    let feature = geoData.features.find(f => f.properties.ADMIN === selectedCountry.name);
+    if (!feature && selectedCountry.name === 'Tanzania') {
       feature = geoData.features.find(f => f.properties.ADMIN === 'United Republic of Tanzania');
     }
     if (!feature) return null;
@@ -168,6 +150,14 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
 
   return (
     <div className="w-full h-full flex items-center justify-center relative" style={{ minHeight: 400 }}>
+      {/* Overlay to clear selection when clicking outside the map */}
+      {selectedCountry && (
+        <div
+          className="fixed inset-0 z-30"
+          style={{ cursor: 'pointer' }}
+          onClick={() => setSelectedCountry(null)}
+        />
+      )}
       {loading ? (
         <div className="flex items-center justify-center h-full w-full">
           <span className="text-gray-500">Loading map...</span>
@@ -181,6 +171,7 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
           className="w-full h-full"
           preserveAspectRatio="xMidYMid meet"
           style={{ background: 'none' }}
+          onClick={e => e.stopPropagation()}
         >
           <defs>
             <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -194,10 +185,10 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
           {/* No SVG text labels rendered */}
         </svg>
       )}
-      {/* Floating details card for hovered country, positioned at the country centroid */}
+      {/* Floating details card for selected country, positioned at the country centroid */}
       {(() => {
-        const centroid = getHoveredCountryCentroid();
-        if (hoveredCountry && centroid) {
+        const centroid = getSelectedCountryCentroid();
+        if (selectedCountry && centroid) {
           // Project SVG coordinates to screen coordinates
           const svg = svgRef.current;
           let left = 0, top = 0;
@@ -218,25 +209,25 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
               style={{ left: left + 24, top: top + 24 }}
             >
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
-                <span className="text-2xl font-bold text-blue-600">{hoveredCountry.finalScore?.toFixed(1)}</span>
+                <h4 className="text-lg font-bold text-gray-900">{selectedCountry.name}</h4>
+                <span className="text-2xl font-bold text-blue-600">{selectedCountry.finalScore?.toFixed(1)}</span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="bg-blue-50 p-2 rounded">
                   <div className="text-gray-600">Literacy Rate</div>
-                  <div className="font-semibold text-blue-700">{hoveredCountry.literacyRate?.toFixed(1)}%</div>
+                  <div className="font-semibold text-blue-700">{selectedCountry.literacyRate?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-green-50 p-2 rounded">
                   <div className="text-gray-600">Digital Infra</div>
-                  <div className="font-semibold text-green-700">{hoveredCountry.digitalInfrastructure?.toFixed(1)}%</div>
+                  <div className="font-semibold text-green-700">{selectedCountry.digitalInfrastructure?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-purple-50 p-2 rounded">
                   <div className="text-gray-600">Investment</div>
-                  <div className="font-semibold text-purple-700">{hoveredCountry.investment?.toFixed(1)}%</div>
+                  <div className="font-semibold text-purple-700">{selectedCountry.investment?.toFixed(1)}%</div>
                 </div>
                 <div className="bg-orange-50 p-2 rounded">
                   <div className="text-gray-600">Fintech Cos</div>
-                  <div className="font-semibold text-orange-700">{hoveredCountry.fintechCompanies ?? 'N/A'}</div>
+                  <div className="font-semibold text-orange-700">{selectedCountry.fintechCompanies ?? 'N/A'}</div>
                 </div>
               </div>
             </div>
