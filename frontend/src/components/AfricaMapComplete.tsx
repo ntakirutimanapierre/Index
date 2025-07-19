@@ -143,6 +143,29 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
     );
   };
 
+  // Helper to get centroid of hovered country
+  function getHoveredCountryCentroid() {
+    if (!geoData || !hoveredCountry) return null;
+    let feature = geoData.features.find(f => f.properties.ADMIN === hoveredCountry.name);
+    if (!feature && hoveredCountry.name === 'Tanzania') {
+      feature = geoData.features.find(f => f.properties.ADMIN === 'United Republic of Tanzania');
+    }
+    if (!feature) return null;
+    const coords = feature.geometry.coordinates;
+    let centerX = 0, centerY = 0;
+    if (feature.geometry.type === 'Polygon' && coords[0]) {
+      const points = coords[0] as number[][];
+      centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+      centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+    } else if (feature.geometry.type === 'MultiPolygon' && coords[0]?.[0]) {
+      const points = coords[0][0] as number[][];
+      centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+      centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+    }
+    if (isNaN(centerX) || isNaN(centerY)) return null;
+    return { centerX, centerY };
+  }
+
   return (
     <div className="w-full h-full flex items-center justify-center relative" style={{ minHeight: 400 }}>
       {loading ? (
@@ -171,45 +194,56 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
           {/* No SVG text labels rendered */}
         </svg>
       )}
-      {/* Tooltip */}
-      {tooltip && (
-        <div
-          className="pointer-events-auto absolute z-50 px-3 py-2 rounded-lg shadow-lg bg-white border border-gray-200 text-sm text-gray-900"
-          style={{ left: tooltip?.x ? tooltip.x + 12 : 0, top: tooltip?.y ? tooltip.y + 12 : 0 }}
-        >
-          <div className="font-semibold">{tooltip?.name ?? ''}</div>
-          {tooltip?.score !== null && tooltip?.score !== undefined && (
-            <div>Score: <span className="font-bold">{tooltip.score.toFixed(1)}</span></div>
-          )}
-        </div>
-      )}
-      {/* Floating details card for hovered country */}
-      {hoveredCountry && (
-        <div className="absolute bottom-8 right-8 z-50 w-80 max-w-full bg-white rounded-xl shadow-lg border border-gray-200 p-5 flex flex-col gap-2 animate-fade-in">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
-            <span className="text-2xl font-bold text-blue-600">{hoveredCountry.finalScore?.toFixed(1)}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="bg-blue-50 p-2 rounded">
-              <div className="text-gray-600">Literacy Rate</div>
-              <div className="font-semibold text-blue-700">{hoveredCountry.literacyRate?.toFixed(1)}%</div>
+      {/* Floating details card for hovered country, positioned at the country centroid */}
+      {(() => {
+        const centroid = getHoveredCountryCentroid();
+        if (hoveredCountry && centroid) {
+          // Project SVG coordinates to screen coordinates
+          const svg = svgRef.current;
+          let left = 0, top = 0;
+          if (svg) {
+            const pt = svg.createSVGPoint();
+            pt.x = centroid.centerX;
+            pt.y = centroid.centerY;
+            const screenCTM = svg.getScreenCTM();
+            if (screenCTM) {
+              const transformed = pt.matrixTransform(screenCTM);
+              left = transformed.x;
+              top = transformed.y;
+            }
+          }
+          return (
+            <div
+              className="pointer-events-auto fixed z-50 w-80 max-w-full bg-white rounded-xl shadow-lg border border-gray-200 p-5 flex flex-col gap-2 animate-fade-in"
+              style={{ left: left + 24, top: top + 24 }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
+                <span className="text-2xl font-bold text-blue-600">{hoveredCountry.finalScore?.toFixed(1)}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-blue-50 p-2 rounded">
+                  <div className="text-gray-600">Literacy Rate</div>
+                  <div className="font-semibold text-blue-700">{hoveredCountry.literacyRate?.toFixed(1)}%</div>
+                </div>
+                <div className="bg-green-50 p-2 rounded">
+                  <div className="text-gray-600">Digital Infra</div>
+                  <div className="font-semibold text-green-700">{hoveredCountry.digitalInfrastructure?.toFixed(1)}%</div>
+                </div>
+                <div className="bg-purple-50 p-2 rounded">
+                  <div className="text-gray-600">Investment</div>
+                  <div className="font-semibold text-purple-700">{hoveredCountry.investment?.toFixed(1)}%</div>
+                </div>
+                <div className="bg-orange-50 p-2 rounded">
+                  <div className="text-gray-600">Fintech Cos</div>
+                  <div className="font-semibold text-orange-700">{hoveredCountry.fintechCompanies ?? 'N/A'}</div>
+                </div>
+              </div>
             </div>
-            <div className="bg-green-50 p-2 rounded">
-              <div className="text-gray-600">Digital Infra</div>
-              <div className="font-semibold text-green-700">{hoveredCountry.digitalInfrastructure?.toFixed(1)}%</div>
-            </div>
-            <div className="bg-purple-50 p-2 rounded">
-              <div className="text-gray-600">Investment</div>
-              <div className="font-semibold text-purple-700">{hoveredCountry.investment?.toFixed(1)}%</div>
-            </div>
-            <div className="bg-orange-50 p-2 rounded">
-              <div className="text-gray-600">Fintech Cos</div>
-              <div className="font-semibold text-orange-700">{hoveredCountry.fintechCompanies ?? 'N/A'}</div>
-            </div>
-          </div>
-        </div>
-      )}
+          );
+        }
+        return null;
+      })()}
       {/* Floating country list card on the right side */}
       <div className="absolute top-8 right-8 z-40 w-64 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-gray-200 p-4 flex flex-col gap-2">
         <h4 className="text-base font-bold mb-2">Countries</h4>
