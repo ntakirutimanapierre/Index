@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Newspaper, ExternalLink, Calendar, TrendingUp, RefreshCw } from 'lucide-react';
-import { NewsArticle } from '../types';
+import type { NewsArticle } from '../types';
 
 export const FinanceNews: React.FC = () => {
   const [news, setNews] = useState<NewsArticle[]>([]);
@@ -245,7 +245,7 @@ export const FinanceNews: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 h-full flex flex-col">
+    <div className="w-full h-auto max-w-full min-w-0 bg-white rounded-xl shadow-sm border border-gray-200 p-2 sm:p-4 flex flex-col gap-2">
       {/* Header */}
       <div className="p-6 pb-4 flex-shrink-0">
         <div className="flex items-center justify-between">

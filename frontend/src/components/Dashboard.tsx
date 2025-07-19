@@ -189,12 +189,12 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-300/10 to-purple-300/10 rounded-full blur-3xl"></div>
       </div>
       
-      <main className="flex-1 px-4 sm:px-8 lg:px-16 py-10 space-y-10 relative z-10">
+      <main className="flex-1 px-2 sm:px-4 md:px-8 pt-4 pb-8 space-y-10 relative z-10 w-full max-w-full min-w-0 overflow-x-hidden">
           {/* Stats Overview */}
           <StatsCards stats={currentStats} />
           {/* Admin Data Management */}
           {currentUser?.role === 'admin' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 w-full max-w-full min-w-0 overflow-x-hidden">
               <DataManagement 
                 getDataInfo={getDataInfo}
                 clearData={clearData}
@@ -209,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
           {/* Sub-component Cards */}
           <SubComponentCards data={currentData} />
           {/* Interactive Analytics */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-12 py-8 w-full max-w-full min-w-0 overflow-x-hidden">
             <InteractiveChart 
               data={currentData} 
               allYearsData={countryData} 
@@ -217,31 +217,35 @@ const Dashboard: React.FC<DashboardProps> = ({ selectedYear, onYearChange }) => 
             />
           </div>
           {/* Main Content Grid - Map and News */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            <div className="xl:col-span-2 flex items-center justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 w-full max-w-full min-w-0 overflow-x-hidden">
+            <div className="md:col-span-1 xl:col-span-2 flex items-center justify-center w-full max-w-full min-w-0 overflow-x-hidden">
               {useNewMap ? (
-                <AfricaMapComplete 
-                  data={currentData}
-                  onCountryHover={setHoveredCountry}
-                  hoveredCountry={hoveredCountry}
-                  shapefilePath={getLocalShapefilePath()}
-                  width={800}
-                  height={600}
-                />
+                <div className="w-full min-w-0 h-64 xl:h-96">
+                  <AfricaMapComplete 
+                    data={currentData}
+                    onCountryHover={setHoveredCountry}
+                    hoveredCountry={hoveredCountry}
+                    shapefilePath={getLocalShapefilePath()}
+                    width={undefined}
+                    height={undefined}
+                  />
+                </div>
               ) : (
-                <AfricaMap 
-                  data={currentData}
-                  onCountryHover={setHoveredCountry}
-                  hoveredCountry={hoveredCountry}
-                />
+                <div className="w-full min-w-0 h-64 xl:h-96">
+                  <AfricaMap 
+                    data={currentData}
+                    onCountryHover={setHoveredCountry}
+                    hoveredCountry={hoveredCountry}
+                  />
+                </div>
               )}
             </div>
-            <div className="xl:col-span-1 h-[400px] sm:h-[500px] lg:h-[600px] bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4">
+            <div className="md:col-span-1 xl:col-span-1 h-64 md:h-80 xl:h-96 bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 w-full max-w-full min-w-0 overflow-x-hidden">
               <FinanceNews />
             </div>
           </div>
           {/* Fintech Startups */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full max-w-full min-w-0 overflow-x-hidden">
             <FintechStartups currentUser={currentUser} />
           </div>
           {/* Country Rankings Table */}

@@ -37,8 +37,9 @@ export const AfricaMap: React.FC<AfricaMapProps> = ({ data, onCountryHover, hove
       <div className="flex-1 px-6 flex flex-col min-h-0">
         <div className="flex-1 min-h-0 mb-4">
           <svg
-            viewBox="0 0 1000 800"
-            className="w-full h-full border border-gray-100 rounded-lg"
+            width="100%"
+            height="100%"
+            viewBox={`0 0 ${width || 800} ${height || 600}`}
             preserveAspectRatio="xMidYMid meet"
           >
             {/* Africa continent outline */}

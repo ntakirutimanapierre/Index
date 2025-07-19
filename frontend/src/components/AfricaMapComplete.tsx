@@ -148,53 +148,53 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
 
     return (
       <>
-        <svg
-          ref={svgRef}
+      <svg
+        ref={svgRef}
           viewBox="250 100 600 700"
           width="90%"
           height="90%"
           className="w-full h-full border border-gray-200 rounded-lg bg-white"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <defs>
-            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
               <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
-            </filter>
-          </defs>
+          </filter>
+        </defs>
 
-          {geoData.features.map((feature) => {
-            const isoCode = feature.properties.ISO_A2;
-            return renderCountryPath(feature, isoCode);
-          })}
+        {geoData.features.map((feature) => {
+          const isoCode = feature.properties.ISO_A2;
+          return renderCountryPath(feature, isoCode);
+        })}
 
-          {geoData.features.map((feature) => {
-            const isoCode = feature.properties.ISO_A2;
-            const countryInfo = countryMap.get(isoCode);
-            if (!countryInfo?.data) return null;
+        {geoData.features.map((feature) => {
+          const isoCode = feature.properties.ISO_A2;
+          const countryInfo = countryMap.get(isoCode);
+          if (!countryInfo?.data) return null;
 
-            const coords = feature.geometry.coordinates;
-            let centerX = 0,
-              centerY = 0;
+          const coords = feature.geometry.coordinates;
+          let centerX = 0,
+            centerY = 0;
 
-            if (feature.geometry.type === 'Polygon' && coords[0]) {
-              const points = coords[0] as number[][];
-              centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
-              centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
-            }
+          if (feature.geometry.type === 'Polygon' && coords[0]) {
+            const points = coords[0] as number[][];
+            centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
+            centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
+          }
 
-            return (
-              <text
-                key={`label-${isoCode}`}
-                x={centerX}
-                y={centerY}
-                textAnchor="middle"
+          return (
+            <text
+              key={`label-${isoCode}`}
+              x={centerX}
+              y={centerY}
+              textAnchor="middle"
                 className="text-xs font-medium fill-black pointer-events-none"
-              >
-                {feature.properties.ADMIN}
-              </text>
-            );
-          })}
-        </svg>
+            >
+              {feature.properties.ADMIN}
+            </text>
+          );
+        })}
+      </svg>
         {/* Tooltip */}
         {tooltip && (
           <div
@@ -282,48 +282,48 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
                   <div className="font-semibold">{tooltip?.name ?? ''}</div>
                   {tooltip?.score !== null && tooltip?.score !== undefined && (
                     <div>Score: <span className="font-bold">{tooltip.score.toFixed(1)}</span></div>
-                  )}
-                </div>
+          )}
+        </div>
               )}
               {/* Floating country info card overlay */}
-              {hoveredCountry && (
+      {hoveredCountry && (
                 <div className="absolute top-6 right-6 z-40 w-96 max-w-full">
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 shadow-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
-                      <div className="text-2xl font-bold text-blue-600">
-                        {hoveredCountry.finalScore.toFixed(1)}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div className="bg-white p-2 rounded">
-                        <div className="text-gray-600">Literacy Rate</div>
-                        <div className="font-semibold text-blue-600">
-                          {hoveredCountry.literacyRate.toFixed(1)}%
-                        </div>
-                      </div>
-                      <div className="bg-white p-2 rounded">
-                        <div className="text-gray-600">Digital Infra</div>
-                        <div className="font-semibold text-green-600">
-                          {hoveredCountry.digitalInfrastructure.toFixed(1)}%
-                        </div>
-                      </div>
-                      <div className="bg-white p-2 rounded">
-                        <div className="text-gray-600">Investment</div>
-                        <div className="font-semibold text-purple-600">
-                          {hoveredCountry.investment.toFixed(1)}%
-                        </div>
-                      </div>
-                      <div className="bg-white p-2 rounded">
-                        <div className="text-gray-600">Fintech Cos</div>
-                        <div className="font-semibold text-orange-600">
-                          {hoveredCountry.fintechCompanies || 'N/A'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
+              <div className="text-2xl font-bold text-blue-600">
+                {hoveredCountry.finalScore.toFixed(1)}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="bg-white p-2 rounded">
+                <div className="text-gray-600">Literacy Rate</div>
+                <div className="font-semibold text-blue-600">
+                  {hoveredCountry.literacyRate.toFixed(1)}%
                 </div>
-              )}
+              </div>
+              <div className="bg-white p-2 rounded">
+                <div className="text-gray-600">Digital Infra</div>
+                <div className="font-semibold text-green-600">
+                  {hoveredCountry.digitalInfrastructure.toFixed(1)}%
+                </div>
+              </div>
+              <div className="bg-white p-2 rounded">
+                <div className="text-gray-600">Investment</div>
+                <div className="font-semibold text-purple-600">
+                  {hoveredCountry.investment.toFixed(1)}%
+                </div>
+              </div>
+              <div className="bg-white p-2 rounded">
+                <div className="text-gray-600">Fintech Cos</div>
+                <div className="font-semibold text-orange-600">
+                  {hoveredCountry.fintechCompanies || 'N/A'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
               {/* Floating legend overlay bottom left */}
               <div className="absolute bottom-6 left-6 z-30 bg-white/90 rounded-lg shadow px-6 py-2 flex gap-6 border border-gray-200">
                 <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-emerald-500 border border-gray-700"></span><span className="text-xs text-black">High (80+)</span></div>

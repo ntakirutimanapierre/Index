@@ -72,7 +72,6 @@ function App() {
             <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-indigo-400/20 rounded-full blur-3xl"></div>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-300/10 to-purple-300/10 rounded-full blur-3xl"></div>
           </div>
-          
           <Header
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
@@ -81,11 +80,11 @@ function App() {
             onAuthClick={openAuthModal}
             onLogout={handleSignOut}
           />
-          <div className="flex flex-1 relative z-10">
+          <div className="flex flex-row flex-1 relative z-10 w-full max-w-full min-w-0 overflow-x-hidden">
             {currentUser && (
               <Sidebar currentUser={currentUser} onSignIn={openAuthModal} onSignOut={handleSignOut} />
             )}
-            <main className={`flex-1 w-full min-h-screen p-8 text-black ${currentUser ? 'lg:ml-64' : ''}`}>
+            <main className={`flex-1 min-w-0 w-full max-w-full overflow-x-hidden p-8 text-black ${currentUser ? 'lg:ml-64' : ''}`}>
               <Routes>
                 <Route path="/" element={<DashboardPage selectedYear={selectedYear} onYearChange={setSelectedYear} />} />
                 <Route path="/analytics" element={<AnalyticsPage selectedYear={selectedYear} onYearChange={setSelectedYear} />} />
@@ -104,8 +103,8 @@ function App() {
               </Routes>
               <AuthModal isOpen={showAuthModal} onClose={closeAuthModal} onAuthSuccess={handleAuthSuccess} currentUser={currentUser} />
             </main>
-          </div>
-        </div>
+      </div>
+      </div>
       </Router>
     </AuthContext.Provider>
   );

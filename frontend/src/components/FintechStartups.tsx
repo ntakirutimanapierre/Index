@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Building2, Globe, Calendar, User, Search, Filter } from 'lucide-react';
 import type { FintechStartup } from '../types';
 
@@ -7,29 +7,24 @@ interface FintechStartupsProps {
 }
 
 export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser }) => {
-  const [startups, setStartups] = useState<FintechStartup[]>([
-    {
-      id: '1',
-      name: 'Flutterwave',
-      country: 'Nigeria',
-      sector: 'Payments',
-      foundedYear: 2016,
-      description: 'Payment infrastructure for global merchants and payment service providers',
-      website: 'https://flutterwave.com',
-      addedBy: 'admin',
-      addedAt: Date.now() - 86400000
-    },
-    {
-      id: '2',
-      name: 'M-Pesa',
-      country: 'Kenya',
-      sector: 'Mobile Money',
-      foundedYear: 2007,
-      description: 'Mobile phone-based money transfer, financing and microfinancing service',
-      addedBy: 'user1',
-      addedAt: Date.now() - 172800000
-    }
-  ]);
+  const [startups, setStartups] = useState<FintechStartup[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch startups from backend on mount
+  useEffect(() => {
+    setLoading(true);
+    fetch('/api/startups')
+      .then(res => res.json())
+      .then(data => {
+        setStartups(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Failed to fetch startups');
+        setLoading(false);
+      });
+  }, []);
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,7 +51,8 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
   ];
   const sectors = ['Payments', 'Mobile Money', 'Lending', 'Insurance', 'Investment', 'Banking', 'Blockchain', 'RegTech'];
 
-  const handleAddStartup = (e: React.FormEvent) => {
+  // Add startup handler
+  const handleAddStartup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!currentUser) {
@@ -71,7 +67,18 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
       addedAt: Date.now()
     };
 
-    setStartups([startup, ...startups]);
+    try {
+      const res = await fetch('/api/startups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(startup),
+      });
+      if (!res.ok) throw new Error('Failed to add startup');
+      const newStartup = await res.json();
+      setStartups(prev => [newStartup, ...prev]); // Show new startup immediately
+    } catch {
+      setError('Failed to add startup');
+    }
     setNewStartup({
       name: '',
       country: '',
@@ -238,46 +245,49 @@ export const FintechStartups: React.FC<FintechStartupsProps> = ({ currentUser })
       )}
 
       {/* Startups Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {filteredStartups.map((startup) => (
-          <div key={startup.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-3">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 mr-2">{startup.name}</h3>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full flex-shrink-0">
-                {startup.sector}
-              </span>
+      {loading ? (
+        <div>Loading startups...</div>
+      ) : error ? (
+        <div className="text-red-600">{error}</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 w-full max-w-full overflow-x-hidden">
+          {filteredStartups.map((startup) => (
+            <div key={startup.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow w-full max-w-full">
+              <div className="flex items-start justify-between mb-3 w-full max-w-full">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex-1 min-w-0 mr-2 truncate">{startup.name}</h3>
+                <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full flex-shrink-0 truncate">
+                  {startup.sector}
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2 break-words">{startup.description}</p>
+              <div className="space-y-2 text-xs sm:text-sm text-gray-500">
+                <div className="flex items-center space-x-2">
+                  <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="truncate">{startup.country}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span>Founded {startup.foundedYear}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="truncate">Added by {startup.addedBy}</span>
+                </div>
+              </div>
+              {startup.website && (
+                <a
+                  href={startup.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block mt-3 text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium truncate"
+                >
+                  Visit Website →
+                </a>
+              )}
             </div>
-
-            <p className="text-xs sm:text-sm text-gray-600 mb-3 line-clamp-2">{startup.description}</p>
-
-            <div className="space-y-2 text-xs sm:text-sm text-gray-500">
-              <div className="flex items-center space-x-2">
-                <Globe className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="truncate">{startup.country}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span>Founded {startup.foundedYear}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <User className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="truncate">Added by {startup.addedBy}</span>
-              </div>
-            </div>
-
-            {startup.website && (
-              <a
-                href={startup.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-3 text-green-600 hover:text-green-700 text-xs sm:text-sm font-medium"
-              >
-                Visit Website →
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {filteredStartups.length === 0 && (
         <div className="text-center py-12">
