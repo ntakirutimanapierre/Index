@@ -163,27 +163,52 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
           <span className="text-gray-500">Loading map...</span>
         </div>
       ) : (
-      <svg
-        ref={svgRef}
-          viewBox="0 0 1000 900"
-          width="100%"
-          height="100%"
-          className="w-full h-full"
-        preserveAspectRatio="xMidYMid meet"
-          style={{ background: 'none' }}
-          onClick={e => e.stopPropagation()}
-      >
-        <defs>
-          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
-          </filter>
-        </defs>
-          {geoData && geoData.features.map((feature) => {
-          const isoCode = feature.properties.ISO_A2;
-          return renderCountryPath(feature, isoCode);
-        })}
-          {/* No SVG text labels rendered */}
-        </svg>
+        <div className="relative w-full h-full">
+          <svg
+            ref={svgRef}
+            viewBox="0 0 1000 900"
+            width="100%"
+            height="100%"
+            className="w-full h-full"
+            preserveAspectRatio="xMidYMid meet"
+            style={{ background: 'none' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <defs>
+              <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
+              </filter>
+            </defs>
+            {geoData && geoData.features.map((feature) => {
+              const isoCode = feature.properties.ISO_A2;
+              return renderCountryPath(feature, isoCode);
+            })}
+            {/* No SVG text labels rendered */}
+          </svg>
+          
+          {/* Legend */}
+          <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 z-10">
+            <div className="text-xs font-semibold text-gray-700 mb-2">Fintech Index Score Ranges</div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded"></div>
+                <span className="text-xs text-gray-600">High (80+)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded"></div>
+                <span className="text-xs text-gray-600">Medium (60-79)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded"></div>
+                <span className="text-xs text-gray-600">Low (40-59)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-gray-500 rounded"></div>
+                <span className="text-xs text-gray-600">Very Low (&lt;40)</span>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
       {/* Floating details card for selected country, positioned at the country centroid */}
       {(() => {

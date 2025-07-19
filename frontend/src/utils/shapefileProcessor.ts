@@ -244,16 +244,18 @@ export const coordinatesToPath = (coordinates: number[][][]): string => {
 };
 
 /**
- * Get country color based on score
+ * Get country color based on score with consistent ranges matching analytics
  */
 export const getCountryColor = (countryData: CountryData | null): string => {
-  if (!countryData) return '#E5E7EB';
+  if (!countryData) return '#E5E7EB'; // Light gray for no data
 
   const score = countryData.finalScore;
-  if (score >= 80) return '#10B981';
-  if (score >= 60) return '#F59E0B';
-  if (score >= 40) return '#EF4444';
-  return '#6B7280';
+  
+  // Match the ranges used in analytics charts
+  if (score >= 80) return '#10B981'; // Green - High (80+)
+  if (score >= 60) return '#F59E0B'; // Yellow - Medium (60-79)
+  if (score >= 40) return '#EF4444'; // Red - Low (40-59)
+  return '#6B7280'; // Gray - Very Low (<40)
 };
 
 /**
