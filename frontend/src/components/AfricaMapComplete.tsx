@@ -143,197 +143,81 @@ export const AfricaMapComplete: React.FC<AfricaMapProps> = ({
     );
   };
 
-  const renderMap = () => {
-    if (!geoData) return null;
-
-    return (
-      <>
-      <svg
-        ref={svgRef}
-          viewBox="250 100 600 700"
-          width="90%"
-          height="90%"
-          className="w-full h-full border border-gray-200 rounded-lg bg-white"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        <defs>
-          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
-          </filter>
-        </defs>
-
-        {geoData.features.map((feature) => {
-          const isoCode = feature.properties.ISO_A2;
-          return renderCountryPath(feature, isoCode);
-        })}
-
-        {geoData.features.map((feature) => {
-          const isoCode = feature.properties.ISO_A2;
-          const countryInfo = countryMap.get(isoCode);
-          if (!countryInfo?.data) return null;
-
-          const coords = feature.geometry.coordinates;
-          let centerX = 0,
-            centerY = 0;
-
-          if (feature.geometry.type === 'Polygon' && coords[0]) {
-            const points = coords[0] as number[][];
-            centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
-            centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
-          }
-
-          return (
-            <text
-              key={`label-${isoCode}`}
-              x={centerX}
-              y={centerY}
-              textAnchor="middle"
-                className="text-xs font-medium fill-black pointer-events-none"
-            >
-              {feature.properties.ADMIN}
-            </text>
-          );
-        })}
-      </svg>
-        {/* Tooltip */}
-        {tooltip && (
-          <div
-            className="pointer-events-auto absolute z-50 px-3 py-2 rounded-lg shadow-lg bg-white border border-gray-200 text-sm text-gray-900"
-            style={{ left: tooltip?.x ? tooltip.x + 12 : 0, top: tooltip?.y ? tooltip.y + 12 : 0 }}
-          >
-            <div className="font-semibold">{tooltip?.name ?? ''}</div>
-            {tooltip?.score !== null && tooltip?.score !== undefined && (
-              <div>Score: <span className="font-bold">{tooltip.score.toFixed(1)}</span></div>
-            )}
-          </div>
-        )}
-        {/* TODO: Style the map and card to match the GSMA Mobile Connectivity Index look (dark background, centered, legend, zoom controls) */}
-      </>
-    );
-  };
-
   return (
-    <div className="bg-gray-50 rounded-xl border border-gray-200 shadow-xl flex flex-col p-6 relative" style={{ width: '100%', minHeight: 500 }}>
-      <div className="p-6 pb-4 flex-shrink-0">
-        <h3 className="text-xl font-bold text-gray-900">Africa Fintech Index Map</h3>
-        {loading && <p className="text-sm text-blue-300 mt-1">Loading map...</p>}
-        {error && <p className="text-sm text-red-400 mt-1">Error: {error}</p>}
-      </div>
-      <div className="flex-1 flex flex-col min-h-0 relative">
-        <div className="flex-1 min-h-0 mb-4 flex items-center justify-center relative" style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)', width: '100%', height: '100%' }}>
-          {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <span className="text-gray-500">Loading map...</span>
-            </div>
-          ) : (
-            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              <svg
-                ref={svgRef}
-                viewBox="250 100 600 700"
-                width="98%"
-                height="98%"
-                className="w-full h-full border border-gray-200 rounded-lg bg-white"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <defs>
-                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
-                  </filter>
-                </defs>
-                {geoData && geoData.features.map((feature) => {
-                  const isoCode = feature.properties.ISO_A2;
-                  return renderCountryPath(feature, isoCode);
-                })}
-                {geoData && geoData.features.map((feature) => {
-                  const isoCode = feature.properties.ISO_A2;
-                  const countryInfo = countryMap.get(isoCode);
-                  if (!countryInfo?.data) return null;
-                  const coords = feature.geometry.coordinates;
-                  let centerX = 0, centerY = 0;
-                  if (feature.geometry.type === 'Polygon' && coords[0]) {
-                    const points = coords[0] as number[][];
-                    centerX = points.reduce((sum, p) => sum + p[0], 0) / points.length;
-                    centerY = points.reduce((sum, p) => sum + p[1], 0) / points.length;
-                  }
-                  return (
-                    <text
-                      key={`label-${isoCode}`}
-                      x={centerX}
-                      y={centerY}
-                      textAnchor="middle"
-                      className="text-xs font-medium fill-black pointer-events-none"
-                    >
-                      {feature.properties.ADMIN}
-                    </text>
-                  );
-                })}
-              </svg>
-              {/* Tooltip */}
-              {tooltip && (
-                <div
-                  className="pointer-events-none absolute z-50 px-3 py-2 rounded-lg shadow-lg bg-white border border-gray-200 text-sm text-gray-900 transition-all duration-75"
-                  style={{
-                    left: Math.min(Math.max(tooltip.x + 16, 8), 520),
-                    top: Math.min(Math.max(tooltip.y + 16, 8), 520),
-                    maxWidth: 200,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  <div className="font-semibold">{tooltip?.name ?? ''}</div>
-                  {tooltip?.score !== null && tooltip?.score !== undefined && (
-                    <div>Score: <span className="font-bold">{tooltip.score.toFixed(1)}</span></div>
+    <div className="w-full h-full flex items-center justify-center relative" style={{ minHeight: 400 }}>
+      {loading ? (
+        <div className="flex items-center justify-center h-full w-full">
+          <span className="text-gray-500">Loading map...</span>
+        </div>
+      ) : (
+        <svg
+          ref={svgRef}
+          viewBox="0 0 1000 900"
+          width="100%"
+          height="100%"
+          className="w-full h-full"
+          preserveAspectRatio="xMidYMid meet"
+          style={{ background: 'none' }}
+        >
+          <defs>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000040" />
+            </filter>
+          </defs>
+          {geoData && geoData.features.map((feature) => {
+            const isoCode = feature.properties.ISO_A2;
+            return renderCountryPath(feature, isoCode);
+          })}
+          {/* No SVG text labels rendered */}
+        </svg>
+      )}
+      {/* Tooltip */}
+      {tooltip && (
+        <div
+          className="pointer-events-auto absolute z-50 px-3 py-2 rounded-lg shadow-lg bg-white border border-gray-200 text-sm text-gray-900"
+          style={{ left: tooltip?.x ? tooltip.x + 12 : 0, top: tooltip?.y ? tooltip.y + 12 : 0 }}
+        >
+          <div className="font-semibold">{tooltip?.name ?? ''}</div>
+          {tooltip?.score !== null && tooltip?.score !== undefined && (
+            <div>Score: <span className="font-bold">{tooltip.score.toFixed(1)}</span></div>
           )}
         </div>
-              )}
-              {/* Floating country info card overlay */}
+      )}
+      {/* Floating details card for hovered country */}
       {hoveredCountry && (
-                <div className="absolute top-6 right-6 z-40 w-96 max-w-full">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 shadow-lg">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
-              <div className="text-2xl font-bold text-blue-600">
-                {hoveredCountry.finalScore.toFixed(1)}
-              </div>
+        <div className="absolute bottom-8 right-8 z-50 w-80 max-w-full bg-white rounded-xl shadow-lg border border-gray-200 p-5 flex flex-col gap-2 animate-fade-in">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-lg font-bold text-gray-900">{hoveredCountry.name}</h4>
+            <span className="text-2xl font-bold text-blue-600">{hoveredCountry.finalScore?.toFixed(1)}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="bg-blue-50 p-2 rounded">
+              <div className="text-gray-600">Literacy Rate</div>
+              <div className="font-semibold text-blue-700">{hoveredCountry.literacyRate?.toFixed(1)}%</div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Literacy Rate</div>
-                <div className="font-semibold text-blue-600">
-                  {hoveredCountry.literacyRate.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Digital Infra</div>
-                <div className="font-semibold text-green-600">
-                  {hoveredCountry.digitalInfrastructure.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Investment</div>
-                <div className="font-semibold text-purple-600">
-                  {hoveredCountry.investment.toFixed(1)}%
-                </div>
-              </div>
-              <div className="bg-white p-2 rounded">
-                <div className="text-gray-600">Fintech Cos</div>
-                <div className="font-semibold text-orange-600">
-                  {hoveredCountry.fintechCompanies || 'N/A'}
-                </div>
-              </div>
+            <div className="bg-green-50 p-2 rounded">
+              <div className="text-gray-600">Digital Infra</div>
+              <div className="font-semibold text-green-700">{hoveredCountry.digitalInfrastructure?.toFixed(1)}%</div>
+            </div>
+            <div className="bg-purple-50 p-2 rounded">
+              <div className="text-gray-600">Investment</div>
+              <div className="font-semibold text-purple-700">{hoveredCountry.investment?.toFixed(1)}%</div>
+            </div>
+            <div className="bg-orange-50 p-2 rounded">
+              <div className="text-gray-600">Fintech Cos</div>
+              <div className="font-semibold text-orange-700">{hoveredCountry.fintechCompanies ?? 'N/A'}</div>
             </div>
           </div>
         </div>
       )}
-              {/* Floating legend overlay bottom left */}
-              <div className="absolute bottom-6 left-6 z-30 bg-white/90 rounded-lg shadow px-6 py-2 flex gap-6 border border-gray-200">
-                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-emerald-500 border border-gray-700"></span><span className="text-xs text-black">High (80+)</span></div>
-                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-yellow-400 border border-gray-700"></span><span className="text-xs text-black">Medium (60-79)</span></div>
-                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-red-400 border border-gray-700"></span><span className="text-xs text-black">Low (40-59)</span></div>
-                <div className="flex items-center gap-2"><span className="inline-block w-5 h-5 rounded bg-gray-400 border border-gray-700"></span><span className="text-xs text-black">Very Low (&lt;40)</span></div>
-              </div>
-            </div>
-          )}
-        </div>
+      {/* Floating country list card on the right side */}
+      <div className="absolute top-8 right-8 z-40 w-64 max-h-[70vh] overflow-y-auto bg-white rounded-xl shadow-lg border border-gray-200 p-4 flex flex-col gap-2">
+        <h4 className="text-base font-bold mb-2">Countries</h4>
+        <ul className="space-y-1">
+          {Array.from(countryMap.values()).filter(c => c.data).map(({ data }) => (
+            <li key={data!.id} className="text-sm text-gray-800 truncate">{data!.name}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );

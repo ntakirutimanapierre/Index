@@ -26,16 +26,16 @@ const CountriesPage: React.FC<{ selectedYear: number; onYearChange: (year: numbe
           </select>
         </div>
         {/* Map Card */}
-        <section className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-0 sm:p-4 mx-auto max-w-full sm:max-w-4xl lg:max-w-7xl relative" style={{ minHeight: 320 }}>
+        <div className="w-full flex items-center justify-center" style={{ minHeight: 600 }}>
           <AfricaMapComplete
             data={currentData}
             shapefilePath={getLocalShapefilePath()}
-            width={undefined}
-            height={undefined}
+            width={1600}
+            height={900}
             hoveredCountry={hoveredCountry}
             onCountryHover={setHoveredCountry}
           />
-        </section>
+        </div>
         {/* Table Card */}
         <section className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-2 sm:p-6 mx-auto max-w-full overflow-x-auto">
           <CountryTable data={currentData} />

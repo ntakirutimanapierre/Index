@@ -400,7 +400,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuc
               >
                 Sign In
               </span>
-            </div>
+        </div>
           )}
         </form>
       </div>
